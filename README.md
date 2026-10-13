@@ -31,6 +31,21 @@
 > 1. **本项目绝非登录资格授予工具**：微信服务端对“平板副设备扫码登录”的席位判决，**独家依赖外部协议 Hook**（如社区成熟方案 `com.roro.tablethook` 或用户自研 Hook）。  
 > 2. **本项目包含什么**：开源模块 `PadDisguise` 仅负责屏幕断点（`sw600dp`）伪装与强制竖屏锁定，解决手机硬件上的界面排版走样、旋转错乱问题，并配套提供官方底包校验、白纸认证态重置与看门狗脚本。模块本身**不含任何登录资格授予逻辑**（详见 [`docs/EXTERNAL_HOOK_SPEC.md`](docs/EXTERNAL_HOOK_SPEC.md)）。  
 > 3. **数据导出伴侣**：如需只读导出微信聊天记录接入 AI 助理，请搭配使用兄弟项目 [`wechat-pad-exporter`](https://github.com/yaping-pro/wechat-pad-exporter)。
+> 4. **物理安卓平板同样需要 Root（关键更正）**：本项目所有能力（外观伪装 `PadDisguise`、认证态治理、数据导出伴侣）均以 Xposed/LSPosed 模块形态运行，底层强依赖 Root（Magisk 或 KernelSU）+ Zygisk + LSPosed/Vector。即便是一台“原生支持微信平板副设备登录”的物理安卓平板——微信本身确实无需任何登录破解即可扫码同登——本项目模块**仍必须运行在已 Root 的设备上**才能安装生效；**若平板未 Root，整套导出/伪装流水线将无法部署。**
+>
+### 📋 完整前置条件清单 (Complete Prerequisites)
+
+> ⛔ **本仓库不提供任何登录资格，也不会替你安装外部 Hook。** 平板 / 手机副设备扫码登录的资格 100% 取决于你自备的**外部协议 Hook**（如社区 `com.roro.tablethook`）。请务必先自行获取并安装该 Hook，再继续。详见 [`docs/EXTERNAL_HOOK_SPEC.md`](docs/EXTERNAL_HOOK_SPEC.md)。
+
+| # | 前置条件 | 说明 / 验证 |
+| :--- | :--- | :--- |
+| ① | **已 Root 的安卓设备** | Magisk 27.0+ 或 KernelSU；`adb shell su -c id` 返回 `uid=0`。物理平板也**必须 Root**，否则模块无法安装。 |
+| ② | **Zygisk + LSPosed 或 Vector** | 推荐 Vector v2.2+（API-102，无参构造 `XposedModule()`）；旧版 LSPosed (API-100) 可能因反射失败报 `NoSuchMethodException`。二者只保留其一，避免 Zygote 竞争崩溃。 |
+| ③ | **官方微信 `8.0.78 / 0x28004e32`** | MD5 `846b411199ae49d335d31b3a17036440`；SHA-256 `41f7dc1f720767fa78fa20dd13ea034b817bbf6ebd23dfd1324c647499c9c1ba`。Beta 版（`0x28004e38`）会被服务端拦截。 |
+| ④ | **外部 pad-login Hook（⚠️ 自备，本仓库不含）** | 单独的第三方组件，需用户自行获取并勾选 `com.tencent.mm` 作用域。**本仓库不提供下载链接、不内置、不修改。** 见 [`docs/EXTERNAL_HOOK_SPEC.md`](docs/EXTERNAL_HOOK_SPEC.md)。缺失它微信只会弹出手机号密码登录，而非扫码登录。 |
+| ⑤ | **（可选）数据导出伴侣仓库** | 仅当你需要把聊天流只读导出到 AI 助理时，再搭配 [`wechat-pad-exporter`](https://github.com/yaping-pro/wechat-pad-exporter)。与登录资格无关。 |
+
+> 🤖 **交给 AI Agent 自动部署？** 本仓库提供 [`AGENT.md`](AGENT.md)：你只需 Root 设备、开启 USB 调试、插上电脑，然后让任意具备 shell 权限的编码 Agent（omp / Claude Code / Codex）读取并执行 [`AGENT.md`](AGENT.md) 即可端到端自动完成部署与校验。
 
 ---
 
@@ -70,7 +85,7 @@ bash scripts/quarantine_tinker.sh
 ```
 
 #### 步骤 4：扫码登录
-在手机上拉起微信，此时界面呈现标准平板排版并展示“平板登录二维码”，使用主力手机扫码授权即可完成双登！
+> 📖 **完整端到端分步手册（从已 Root 手机到可用扫码登录）**：请直接查阅权威 SOP [`docs/TABLET_LOGIN_SOP.md`](docs/TABLET_LOGIN_SOP.md)，无需在本文重复照搬。交给 Agent 自动执行见 [`AGENT.md`](AGENT.md)。
 
 ---
 
@@ -149,6 +164,7 @@ TARGET_USER=999 bash scripts/preflight_check.sh
 ### 📚 详细文档索引
 
 - [权威 5 步扫码登录操作手册 (SOP)](docs/TABLET_LOGIN_SOP.md)
+- [🤖 AI Agent 自动化部署 Runbook (AGENT.md)](AGENT.md)
 - [登录成功验收判据与日志特征](docs/TABLET_LOGIN_SUCCESS.md)
 - [外部协议 Hook 依赖规范与靶点剖析](docs/EXTERNAL_HOOK_SPEC.md)
 - [双模块共存分析与开关配置说明](docs/COEXIST_ANALYSIS.md)
@@ -167,8 +183,18 @@ TARGET_USER=999 bash scripts/preflight_check.sh
 
 ### 📄 开源许可证
 
-本项目基于 [GNU General Public License v3.0 (GPL-3.0)](LICENSE) 许可证开源。
 
+---
+
+## 💬 交流群 (Community)
+
+<img src="assets/wechat-group-qr.png" alt="微信个人助理交流 群二维码" width="220" />
+
+**群名称**：`微信个人助理交流`
+
+> ⏳ **有效期提示**：本群二维码为微信临时群码，**有效期有限，目前有效至 2026-10-20**。过期后将无法扫码加入。仓库维护者会在群码轮换时**替换 `assets/wechat-group-qr.png`**（单文件替换即可），请始终以本仓库最新提交的图片为准。若二维码已过期，请前往仓库 [Issues](https://github.com/yaping-pro/wx-tablet-mode/issues) 反馈，或查看 `assets/wechat-group-qr.png` 的最新提交版本。
+
+> 🛠️ **维护者须知**：当群码轮换时，直接将 `assets/wechat-group-qr.png` 替换为最新的群二维码图片（同名覆盖），并更新上方有效期日期即可，无需改动其他文件。
 ---
 
 ## English
@@ -191,6 +217,21 @@ TARGET_USER=999 bash scripts/preflight_check.sh
 > 1. **NOT a Login Bypass or Entitlement Granting Tool**: WeChat server-side secondary tablet mode login entitlement relies **strictly on an external protocol Hook** (such as community module `com.roro.tablethook` or proprietary custom reverse-engineered hooks).  
 > 2. **What this repository provides**: The open-source `PadDisguise` module solely provides layout breakpoint (`sw600dp`) disguise and portrait orientation locking to eliminate UI distortions and unintended rotations on smartphone screens. It contains **no login qualification logic** whatsoever (see [`docs/EXTERNAL_HOOK_SPEC.md`](docs/EXTERNAL_HOOK_SPEC.md)).  
 > 3. **Chat Stream Export**: For read-only chat export to AI assistants, see the companion project [`wechat-pad-exporter`](https://github.com/yaping-pro/wechat-pad-exporter).
+> 4. **A physical Android tablet STILL needs Root (important correction)**: Every capability in this project (the `PadDisguise` appearance module, auth-state governance, the data-export companion) ships as an Xposed/LSPosed module, which fundamentally requires Root (Magisk or KernelSU) + Zygisk + LSPosed/Vector. Even on a physical Android tablet where WeChat itself natively supports tablet secondary-device scan login without any hack — this project's modules **still must run on a rooted device** to be installed; **if the tablet is unrooted, the entire disguise/export pipeline cannot be deployed.**
+>
+### 📋 Complete Prerequisites
+
+> ⛔ **This repository grants NO login entitlement and will NOT install the hook for you.** The tablet/phone secondary-device scan-login entitlement is 100% decided by the **external protocol hook** YOU must supply (e.g. community `com.roro.tablethook`). Obtain and install it yourself first. See [`docs/EXTERNAL_HOOK_SPEC.md`](docs/EXTERNAL_HOOK_SPEC.md).
+
+| # | Prerequisite | Notes / Verification |
+| :--- | :--- | :--- |
+| ① | **Rooted Android device** | Magisk 27.0+ or KernelSU; `adb shell su -c id` returns `uid=0`. A physical tablet **must also be rooted**, or the modules cannot be installed. |
+| ② | **Zygisk + LSPosed or Vector** | Vector v2.2+ (API-102, no-arg `XposedModule()`) is recommended; older LSPosed (API-100) may throw `NoSuchMethodException` via reflection. Keep only one of them active to avoid Zygote injection races. |
+| ③ | **Official WeChat `8.0.78 / 0x28004e32`** | MD5 `846b411199ae49d335d31b3a17036440`; SHA-256 `41f7dc1f720767fa78fa20dd13ea034b817bbf6ebd23dfd1324c647499c9c1ba`. The Beta build (`0x28004e38`) is rejected by the server. |
+| ④ | **External pad-login hook (⚠️ bring your own, NOT in this repo)** | A separate third-party component you must obtain and scope to `com.tencent.mm`. **This repo provides no download link, ships nothing, and modifies nothing.** See [`docs/EXTERNAL_HOOK_SPEC.md`](docs/EXTERNAL_HOOK_SPEC.md). Without it, WeChat shows phone/password login instead of the QR. |
+| ⑤ | **(Optional) companion export repo** | Only if you want to read-only export chat streams to an AI assistant, pair with [`wechat-pad-exporter`](https://github.com/yaping-pro/wechat-pad-exporter). Unrelated to login entitlement. |
+
+> 🤖 **Hand setup to an AI agent?** This repo ships [`AGENT.md`](AGENT.md): just root the device, enable USB debugging, plug it in, then let any shell-capable coding agent (omp / Claude Code / Codex) read and execute [`AGENT.md`](AGENT.md) to complete the whole deployment and verification end-to-end.
 
 ---
 
@@ -309,6 +350,7 @@ TARGET_USER=999 bash scripts/preflight_check.sh
 ### 📚 Documentation Index
 
 - [Authoritative 5-Step QR Login SOP](docs/TABLET_LOGIN_SOP.md)
+- [🤖 AI Agent Autonomous Runbook (AGENT.md)](AGENT.md)
 - [Login Acceptance Criteria & Log Signatures](docs/TABLET_LOGIN_SUCCESS.md)
 - [External Protocol Hook Specification & Hook Targets](docs/EXTERNAL_HOOK_SPEC.md)
 - [Dual-Module Coexistence & Toggle Configuration](docs/COEXIST_ANALYSIS.md)
@@ -327,4 +369,15 @@ TARGET_USER=999 bash scripts/preflight_check.sh
 
 ### 📄 License
 
-Distributed under the [GNU General Public License v3.0 (GPL-3.0)](LICENSE).
+
+---
+
+## 💬 Community
+
+<img src="assets/wechat-group-qr.png" alt="WeChat Personal Assistant Community group QR" width="220" />
+
+**Group name**: `微信个人助理交流` (WeChat Personal Assistant Community)
+
+> ⏳ **Expiry notice**: This is a WeChat temporary group QR code with **limited validity — currently valid until 2026-10-20**. It will stop working after expiry. The maintainer refreshes this file (`assets/wechat-group-qr.png`) by swapping in the newest group QR when it rotates, so always rely on the latest committed image in this repo. If the QR has expired, please open an [Issue](https://github.com/yaping-pro/wx-tablet-mode/issues) or check `assets/wechat-group-qr.png` for the latest committed version.
+
+> 🛠️ **Maintainer note**: When the group code rotates, simply replace `assets/wechat-group-qr.png` with the newest group QR image (same filename) and update the validity date above. No other files need to change.
