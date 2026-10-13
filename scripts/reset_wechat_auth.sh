@@ -40,7 +40,10 @@ fi
 
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 BACKUP_DIR="/data/adb/wx_stream/backup_auth_${TIMESTAMP}"
-MM_DATA_DIR="/data/user/${TARGET_USER}/com.tencent.mm"
+# MM_DATA_ROOT lets CI/sandbox tests point at a fake WeChat data dir.
+# Default keeps the real device path; setting it changes nothing on-device
+# unless you explicitly override it (testability only, no semantic change).
+MM_DATA_DIR="${MM_DATA_ROOT:-/data/user/${TARGET_USER}/com.tencent.mm}"
 
 if [[ "$DRY_RUN" == "true" ]]; then
   echo "=========================================================="

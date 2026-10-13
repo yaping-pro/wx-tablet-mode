@@ -65,7 +65,10 @@ if [[ "$BACKUP_EXISTS" != "ok" ]]; then
   exit 1
 fi
 
-MM_DATA_DIR="/data/user/${TARGET_USER}/com.tencent.mm"
+# MM_DATA_ROOT lets CI/sandbox tests point at a fake WeChat data dir.
+# Default keeps the real device path; setting it changes nothing on-device
+# unless you explicitly override it (testability only, no semantic change).
+MM_DATA_DIR="${MM_DATA_ROOT:-/data/user/${TARGET_USER}/com.tencent.mm}"
 
 # Dynamically discover UID/GID of the WeChat data directory
 echo "[*] Detecting ownership for $MM_DATA_DIR..."

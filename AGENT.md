@@ -107,6 +107,20 @@ adb install -r wx-tablet-mode-*-arm.apk   # or: app/build/outputs/apk/release/ap
   add `com.tencent.mm` to its Scope. This activates BOTH appearance disguise and the built-in pad-login
   qualification hook (`PadLoginHook`).
 - **Abort condition**: install fails (e.g. device not rooted / module framework missing) → go back to Preflight.
+- **Clone-space / multi-user install (`TARGET_USER` ≠ 0)**: if deploying into a clone profile (e.g. MIUI User 999), the APK above installs only into User 0. You MUST map the module into the clone space, then force Vector to rebuild its in-memory scope cache — **Vector's daemon does NOT auto-refresh when a module is added to a clone space**, so it keeps `validUserIds={0}` and silently skips u999 injection until you toggle it:
+  ```bash
+  adb shell su -c "pm install-existing --user $TARGET_USER com.wx.pad"
+  # Force Vector daemon to rebuild in-memory scope dispatch tables for the clone user:
+  adb shell su -c "/data/adb/modules/zygisk_vector/cli modules disable com.wx.pad"
+  adb shell su -c "/data/adb/modules/zygisk_vector/cli modules enable  com.wx.pad"
+  adb shell su -c "/data/adb/modules/zygisk_vector/cli scope set com.wx.pad com.tencent.mm/$TARGET_USER"
+  ```
+  > ⚠️ **`PadLoginHook` only runs in the primary `com.tencent.mm` process.** The hook strictly gates on
+  > `processName == "com.tencent.mm"` and is NEVER injected into auxiliary sub-processes (`:support`,
+  > `:push`, `:appbrand`). A clone-space install plus the cache-dance above are required precisely because
+  > the daemon would otherwise skip the main process for the clone user. Always verify against the main
+  > process PID (see Step E), never against a `:push`/`:support` PID.
+
 
 ### Step D ✅ — Quarantine Tinker patches
 
@@ -118,19 +132,31 @@ TARGET_USER="${TARGET_USER:-0}" bash scripts/quarantine_tinker.sh
 - **Abort condition**: none fatal; warn if patches were found and moved.
 - **Idempotent**: ✅ safe to re-run.
 
-### Step E ✅ — Verify pad hook is present & scoped (HARD GATE)
+### Step E ✅ — Verify pad hook is present, scoped & injected (HARD GATE)
 
 ```bash
-# Built-in hook (com.wx.pad) or optional external hook (com.roro.tablethook):
+# 1. Built-in hook (com.wx.pad) or optional external hook (com.roro.tablethook):
 adb shell pm list packages --user "$TARGET_USER" com.wx.pad
 # Optional external hook check (if user disabled built-in via persist.wx.pad.loginhook=0):
 adb shell pm list packages --user "$TARGET_USER" com.roro.tablethook || true
+
+# 2. PROVE INJECTION — do NOT trust package presence alone.
+#    Resolve the PRIMARY WeChat process PID (processName == "com.tencent.mm"), then grep its
+#    /proc/<pid>/maps for the module. PadLoginHook only runs in this main process.
+PID=$(adb shell su -c "pidof com.tencent.mm" | tr -d '\r' | awk '{print $1}')
+echo "Primary WeChat PID: $PID"
+adb shell su -c "grep -E 'com\.wx\.pad|wx/pad' /proc/$PID/maps" | tr -d '\r'
 ```
 
-- **Expected output**: at least one hook package (`com.wx.pad` or `com.roro.tablethook`) is listed.
+- **Expected output**: at least one hook package (`com.wx.pad` or `com.roro.tablethook`) is listed, AND
+  the `/proc/$PID/maps` grep returns at least one line mapping the module into the primary process.
 - **Abort condition (HARD GATE)**: neither package is present → **STOP**, report:
   "No pad hook installed. Install latest `wx-tablet-mode-*-arm.apk` from Releases (Step C) and scope it to
   `com.tencent.mm`, then re-run." Do NOT continue.
+- **Injection miss (package present but maps empty)**: if the package is listed but `/proc/$PID/maps` shows
+  no `com.wx.pad` mapping, the daemon skipped injection — on a clone user re-run the Step C cache-dance
+  (`modules disable`/`enable` + `scope set`), then `am force-stop` and relaunch WeChat. In the `maps` grep,
+  match the PRIMARY `com.tencent.mm` PID only; `:support`/`:push`/`:appbrand` PIDs legitimately have no hook.
 ### Step F ⚠️ — Launch QR login
 
 ```bash

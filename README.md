@@ -88,7 +88,7 @@ bash scripts/quarantine_tinker.sh
 ```
 
 #### 步骤 4：扫码登录
-强制停止并重新打开微信，在登录界面即可选择作为平板设备登录（扫码登录），用主力手机扫码即可实现双设备同号同时在线！
+强制停止并重新打开微信（**重要**：必须使用 `am force-stop com.tencent.mm` 或重启设备，从最近任务上滑划掉微信无法真正杀死主进程，Hook 不会重新注入），在登录界面即可选择作为平板设备登录（扫码登录），用主力手机扫码即可实现双设备同号同时在线！
 > 📖 **完整端到端分步手册（从已 Root 手机到可用扫码登录）**：请直接查阅权威 SOP [`docs/TABLET_LOGIN_SOP.md`](docs/TABLET_LOGIN_SOP.md)。交给 Agent 自动执行见 [`AGENT.md`](AGENT.md)。
 
 ---
@@ -164,6 +164,36 @@ TARGET_USER=999 bash scripts/preflight_check.sh
 
 #### Q6: 重启手机后微信无法自启或报错找不到数据目录？
 **A**: Android 基于文件加密 (FBE)。开机后在用户首次输入锁屏密码前，凭据加密存储 (CE) 处于锁定状态。作为常驻副设备的备用机，建议在“开发者选项/安全设置”中取消锁屏密码，或开机后手动解锁一次。
+#### Q7: 在分身空间（如 User 999）安装模块后，微信仍没有生效 / 扫码页不出现？
+**A**: 这是 **Vector 守护进程克隆空间缓存未失效** 的已知问题，与模块本身无关：
+1. 即便已执行 `pm install-existing --user <UID> com.wx.pad`，Vector 守护进程内存态的 `DaemonState.validUserIds` 仍停留在 `{0}`，会**静默跳过 u999 注入**，直到缓存被强制重建。
+2. 修复命令（强制 Vector 重建内存派发表）：
+   ```bash
+   su -c "/data/adb/modules/zygisk_vector/cli modules disable com.wx.pad"
+   su -c "/data/adb/modules/zygisk_vector/cli modules enable  com.wx.pad"
+   su -c "/data/adb/modules/zygisk_vector/cli scope set com.wx.pad com.tencent.mm/<UID>"
+   ```
+3. 随后 `am force-stop --user <UID> com.tencent.mm` 并重新拉起微信即可。详见 [`AGENT.md`](AGENT.md)。
+
+#### Q8: 运行时软开关 `persist.wx.pad.loginhook` / `persist.wx.pad.disguise` 的取值行为对照？
+**A**: 两个属性均为 Android 系统属性软开关（`setprop`），无需重装或重编译即可即时调控。修改后需 **`am force-stop` 或重启微信** 方可生效（见下方重启说明）。
+
+| 系统属性 (Property) | 取值 | `padlogin` 行为 / `disguise` 行为 | 说明 |
+| :--- | :---: | :--- | :--- |
+| `persist.wx.pad.loginhook` | `1` 或 未设置 | 启用内置 `PadLoginHook`（默认开启；源码中任何非精确 `"0"` 的值均视为启用） | 单 APK 自包含，无需任何第三方 Hook |
+| `persist.wx.pad.loginhook` | `0` | 停用内置 `PadLoginHook` | 便于回退至外部第三方 Hook（如 `com.roro.tablethook`）或纯外观伪装 |
+| `persist.wx.pad.disguise` | `1` 或 未设置 | 启用 `PadDisguise`（`sw600dp` 断点与竖屏锁定，默认开启） | 伪装平板环境 |
+| `persist.wx.pad.disguise` | `0` | 停用 `PadDisguise` | 由外部模块独占外观伪装 |
+
+> ⚠️ **重启微信的正确方式**：修改上述属性后，**必须**通过 `am force-stop com.tencent.mm`（root）或**重启设备**来重启微信进程，才能重新触发 Hook 注入。**从最近任务（Recents）上滑划掉微信并不能杀死微信主进程**——微信的 `:support` / `:push` 等常驻子进程仍在后台，使新属性与 Hook 注入不生效。只有 `am force-stop` 或整机重启能确保主进程 `com.tencent.mm` 被真正终止。
+
+#### Q9: 如何从外部闭源 Hook `com.roro.tablethook` 平滑“毕业”迁移到内置 `PadLoginHook`？
+**A**: 内置 `PadLoginHook` 已实机验证与 `com.roro.tablethook` 完全对等（DexKit 候选 平板 2/1、资格 1/1，logcat 签名 `微信平板登录模式已启用` 一致）。推荐按以下 SOP 零风险迁移：
+1. **并行启用**：保持 `com.roro.tablethook` 启用，同时确保内置 `com.wx.pad` 已安装且作用域勾选 `com.tencent.mm`，`persist.wx.pad.loginhook` 保持默认（`1`）。
+2. **验证 logcat 签名**：`am force-stop` 并重启微信，抓取 logcat 确认出现 `微信平板登录模式已启用`（来自 `com.wx.pad`）与既有 roro 签名并存；内置 Hook 命中即证明可独立承担资格赋予。
+3. **停用外部 Hook**：`su -c 'setprop persist.wx.pad.loginhook 1'`（确保内置开启），并在 Vector / LSPosed 管理器中取消 `com.roro.tablethook` 对 `com.tencent.mm` 的作用域勾选（或直接禁用该模块）。再次 `am force-stop` 重启微信确认仅凭内置 Hook 仍正常扫码。
+4. **回滚预案**：若迁移后出现异常，可立即 `setprop persist.wx.pad.loginhook 0` 重新启用 `com.roro.tablethook` 作用域，进程重启即可回退；必要时运行 `scripts/rollback_wechat_auth.sh` 还原认证态。外部 Hook 现已为**完全可选**项。
+
 
 ---
 
@@ -296,7 +326,7 @@ bash scripts/quarantine_tinker.sh
 ```
 
 #### Step 4: Scan QR Code to Log In
-Force-stop and re-open WeChat. The interface will display a tablet dual-pane layout with a tablet login QR code. Scan the QR code using your primary mobile device to authorize tablet-mode coexistence!
+Force-stop and re-open WeChat (**important**: use `am force-stop com.tencent.mm` or reboot the device — swiping WeChat away from Recents does **not** kill the main process, so the hook will not be re-injected). The interface will display a tablet dual-pane layout with a tablet login QR code. Scan the QR code using your primary mobile device to authorize tablet-mode coexistence!
 > 📖 **Authoritative 5-Step SOP**: See [`docs/TABLET_LOGIN_SOP.md`](docs/TABLET_LOGIN_SOP.md). Handing setup to an AI Agent? See [`AGENT.md`](AGENT.md).
 
 ---
@@ -371,6 +401,36 @@ TARGET_USER=999 bash scripts/preflight_check.sh
 
 #### Q6: WeChat fails to start after reboot?
 **A**: Android File-Based Encryption (FBE) locks Credential Encrypted (CE) storage until first unlock. For an always-on dedicated secondary device, consider removing the lockscreen password in system settings or unlocking manually once after boot.
+#### Q7: Module installed in a clone space (e.g. User 999) but WeChat still not working / no QR code?
+**A**: This is the **known Vector daemon clone-space cache quirk**, unrelated to the module itself:
+1. Even after `pm install-existing --user <UID> com.wx.pad`, Vector daemon's in-memory `DaemonState.validUserIds` stays at `{0}` and **silently skips u999 injection** until the cache is force-rebuilt.
+2. Fix (force Vector to rebuild its in-memory dispatch tables):
+   ```bash
+   su -c "/data/adb/modules/zygisk_vector/cli modules disable com.wx.pad"
+   su -c "/data/adb/modules/zygisk_vector/cli modules enable  com.wx.pad"
+   su -c "/data/adb/modules/zygisk_vector/cli scope set com.wx.pad com.tencent.mm/<UID>"
+   ```
+3. Then `am force-stop --user <UID> com.tencent.mm` and relaunch WeChat. See [`AGENT.md`](AGENT.md).
+
+#### Q8: Runtime toggle behavior matrix for `persist.wx.pad.loginhook` / `persist.wx.pad.disguise`?
+**A**: Both are Android system-property soft toggles (`setprop`) that take effect immediately without reinstalling or recompiling. After changing them you must **`am force-stop` or reboot WeChat** for the new value to apply (see the restart note below).
+
+| Property | Value | `padlogin` / `disguise` behavior | Notes |
+| :--- | :---: | :--- | :--- |
+| `persist.wx.pad.loginhook` | `1` or unset | Built-in `PadLoginHook` enabled (default ON; any value other than exactly `"0"` is treated as enabled) | Self-contained single APK, no third-party hook needed |
+| `persist.wx.pad.loginhook` | `0` | Built-in `PadLoginHook` disabled | Fall back to external hook (e.g. `com.roro.tablethook`) or appearance-only mode |
+| `persist.wx.pad.disguise` | `1` or unset | `PadDisguise` enabled (`sw600dp` breakpoint + portrait lock, default ON) | Disguises tablet environment |
+| `persist.wx.pad.disguise` | `0` | `PadDisguise` disabled | External module owns appearance disguise exclusively |
+
+> ⚠️ **Correct way to restart WeChat**: After changing a property, you **must** use `am force-stop com.tencent.mm` (as root) or **reboot the device** to restart the WeChat process and re-trigger hook injection. **Swiping WeChat away from Recents does NOT kill the main process** — WeChat's `:support` / `:push` helper processes keep running in the background, so the new property and hook injection never take effect. Only `am force-stop` or a full reboot truly terminates the `com.tencent.mm` main process.
+
+#### Q9: How to "graduate" from the external closed-source hook `com.roro.tablethook` to the built-in `PadLoginHook`?
+**A**: The built-in `PadLoginHook` is proven on-device to be fully on par with `com.roro.tablethook` (DexKit candidates tablet 2/1, qualification 1/1, identical logcat signature `微信平板登录模式已启用`). Migrate risk-free via this SOP:
+1. **Enable both in parallel**: Keep `com.roro.tablethook` enabled, but also ensure built-in `com.wx.pad` is installed with `com.tencent.mm` in its scope and `persist.wx.pad.loginhook` at its default (`1`).
+2. **Verify logcat signature**: `am force-stop` and relaunch WeChat; capture logcat and confirm `微信平板登录模式已启用` (from `com.wx.pad`) appears alongside the existing roro signature — proving the built-in hook independently grants qualification.
+3. **Disable the external hook**: ensure `setprop persist.wx.pad.loginhook 1`, then uncheck `com.roro.tablethook` from `com.tencent.mm`'s scope in Vector / LSPosed (or disable that module). `am force-stop` and relaunch WeChat again to confirm the built-in hook alone still yields the QR login.
+4. **Rollback plan**: If anything misbehaves after migration, immediately `setprop persist.wx.pad.loginhook 0` and re-enable `com.roro.tablethook` scope, then restart the process to fall back; if needed, run `scripts/rollback_wechat_auth.sh` to restore auth state. The external hook is now **entirely optional**.
+
 
 ---
 

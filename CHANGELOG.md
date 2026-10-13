@@ -5,6 +5,22 @@
 
 ---
 
+## [v1.0.5] - 2026-10-14
+### Fixed
+- **Vector 克隆空间注入缓存失效 (Clone-Space Cache Quirk)**：当模块 `com.wx.pad` 通过 `pm install-existing --user 999 com.wx.pad` 安装进分身空间（User 999）后，Vector 守护进程内存态 `DaemonState.validUserIds` 仍停留在 `{0}`，会**静默跳过 u999 注入**，直到通过 CLI 执行 `modules disable` → `modules enable` → `scope set` 强制重建缓存。已在 `AGENT.md` 与 `docs` 中补充修复步骤（见下方 Documented）。
+
+### Hardened
+- **认证态重置/回滚测试可注入性 (`MM_DATA_ROOT`)**：`scripts/reset_wechat_auth.sh` 与 `scripts/rollback_wechat_auth.sh` 新增可选环境变量 `MM_DATA_ROOT`，默认值仍为 `/data/user/<UID>`，**不改变任何设备语义**；仅用于指向沙箱/测试目录以便离线校验脚本逻辑。子目录完整相对路径保留（自 v1.0.4 起）保持不变。
+
+### Documented
+- **运行时软开关属性矩阵**：于 `docs/EXTERNAL_HOOK_SPEC.md` 与 README FAQ 详述 `persist.wx.pad.loginhook` / `persist.wx.pad.disguise` 在 `0` / `1` / 未设置 三种取值下的行为对照（见 README FAQ Q8）。
+- **外部闭源 Hook 毕业迁移 SOP**：新增从 `com.roro.tablethook` 平滑毕业至内置 `PadLoginHook` 的标准操作（并行启用 → 验证 logcat 签名 → 停用外部 Hook → 回滚预案），见 README FAQ Q9 与 `docs/EXTERNAL_HOOK_SPEC.md`。
+
+### Verified
+- **内置 Hook 与 roro 实机对等**：`com.wx.pad` v1.0.4 的 `PadLoginHook` 已**实机验证可用**（`com.wx.pad: 微信平板登录模式已启用`，DexKit 候选 平板 2/1、资格 1/1，与 `com.roro.tablethook` 完全一致），内置模块可完整替代外部闭源 Hook。
+
+---
+
 ## [v1.0.4] - 2026-10-13
 ### Fixed
 - **合规去引流化 (L-001)**：彻底移除微信交流群临时二维码（`assets/wechat-group-qr.png`）及其相关引用，技术支持与交流统一迁移至 GitHub Discussions。
@@ -15,7 +31,6 @@
 - **认证态重置与回滚脚本重构 (O-004)**：重写 `scripts/reset_wechat_auth.sh` 与 `rollback_wechat_auth.sh`，保留完整的子目录相对路径消除同名覆盖隐患，精准对齐 `/MicroMsg/autoauth.cfg` 等真实设备路径，新增 `--dry-run` 预览模式与幂等空跑保护。
 
 ---
-
 ## [v1.0.3] - 2026-10-13
 ### Fixed
 - 修复 CI 签名配置：启用 v1 (JAR) 与 v2 (APK Signature Scheme v2) 签名并添加自动化发布校验。

@@ -8,6 +8,8 @@
 - **单一 APK 同时具备伪装与登录资格**：模块源码内置全新 `PadLoginHook` 组件，基于 LuckyPray/DexKit 动态特征匹配与拦截，直接赋予微信副设备扫码登录资格。
 - **100% 纯开源与洁癖合规**：绝不打包、不分发任何第三方未授权闭源 APK（如 `tablethook.apk`）或腾讯专有二进制。所有逻辑均为遵循 GPL-3.0 的第一方源码实现。
 - **外部 Hook 转为可选（Optional）兼容模式**：如果用户仍偏好使用自己编译或第三方提供的外部 Hook，可通过系统属性软开关一键禁用内置 Hook。
+- **毕业里程碑 (Graduation Milestone) — 实机对等验证已完成**：`com.wx.pad` v1.0.4 的 `PadLoginHook` 已**实机验证与 `com.roro.tablethook` 完全对等**——DexKit 候选命中数一致（平板环境判定 2/1、副设备登录资格 1/1），且启动微信主进程后 Logcat 均输出标准特征信号 `com.wx.pad: 微信平板登录模式已启用`。由此，外部闭源 Hook 已不再是资格赋予的必要项，正式降级为**完全可选的兼容项**。新用户只需安装本模块即可获得扫码登录资格；历史 `com.roro.tablethook` 用户可按 README FAQ Q9 的 SOP 零风险平滑迁移至内置 Hook。
+
 
 ---
 
