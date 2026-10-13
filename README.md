@@ -3,42 +3,50 @@
 [![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
 [![Build APK](https://github.com/yaping-pro/wx-tablet-mode/actions/workflows/build-apk.yml/badge.svg)](.github/workflows/build-apk.yml)
 
+[中文](#中文) | [English](#english)
+
+---
+
+## 中文
+
+### 核心前置声明
+
 > ⚠️ **核心前置声明 (Core Prerequisite & Boundary)**:  
 > 本项目是**微信安卓平板副设备登录的【方法论智库、官方包校验 SOP、环境治理脚本与外观伪装辅助件】**，**绝非登录资格授予工具**！  
 > 微信服务端平板副设备登录席位的资格判决，**独家依赖外部协议 Hook**（如社区闭源 `com.roro.tablethook` 或用户自研逆向 Hook）。本项目自带的 `PadDisguise` 开源模块仅负责屏幕断点（`sw600dp`）伪装与强制竖屏锁定，解决手机硬件上的界面排版与旋转问题，**不含**任何登录资格授予逻辑。详细规范请参阅 [`docs/EXTERNAL_HOOK_SPEC.md`](docs/EXTERNAL_HOOK_SPEC.md)。
 
 ---
 
-## 脆弱性与维护生命周期预警 (Fragility & Lifecycle Notice)
+### 脆弱性与维护生命周期预警
 
 > ⚠️ **高脆弱性警告**：  
 > 本项目高度受制于腾讯服务端对 Pad 设备判决逻辑与微信客户端大版本的升级策略。微信通常在 6~12 个月内对陈旧客户端下发 `force_update` 强制升级指令。一旦 `8.0.78` 官方底包被服务端全面阻断，方案将面临版本失效风险，需社区持续逆向跟进新版本特征。
 
 ---
 
-## 仓库范围与功能定位 (What it IS & What it is NOT)
+### 仓库范围与功能定位
 
-### What it IS
+#### 本项目包含 (What it IS)
 1. **官方包校验 SOP 与干净认证态重置**：提供经过反复生产验证的官方正式版（`8.0.78 / 0x28004e32`）哈希比对与白纸认证态重置机制。
 2. **开源外观与排版辅助模块 (`PadDisguise`)**：覆写 `Build.MODEL` 等设备标识，伪装 `smallestScreenWidthDp >= 600`，强制竖屏防止旋转错乱。
 3. **一键就绪自检与环境运维脚本**：自动化检测 Root、Zygisk、Vector API-102 框架、Tinker 热修复隔离及安全回滚。
 
-### What it is NOT
+#### 本项目不包含 (What it is NOT)
 1. **绝不是登录资格授予工具**：必须搭配合法的外部协议 Hook 才能完成副设备扫码认证。
-2. **绝不包含任何聊天数据嗅探或个人助理逻辑**：数据提取与导出属于独立项目生态。
+2. **绝不包含任何聊天数据嗅探或个人助理逻辑**：数据提取与导出属于独立项目生态（请参阅 [`wechat-pad-exporter`](https://github.com/yaping-pro/wechat-pad-exporter)）。
 3. **绝不包含或分发任何专有微信二进制**：不提供修改版 APK 或微信专有代码，详见 [`NO_PROPRIETARY_BINARIES.md`](NO_PROPRIETARY_BINARIES.md)。
 
 ---
 
-## 快速上手 (Quick Start)
+### 快速上手
 
-### 1. 前置条件 (Prerequisites)
+#### 1. 前置条件
 - **已 Root 的 Android 设备**（Magisk 27+ 或 KernelSU）
 - **Zygisk + Vector 框架**：推荐 **Vector v2.2+ (API-102)**，避免旧版 LSPosed API-100 反射构造异常。
 - **官方微信正式版底包**：安装官方 `8.0.78` 正式版（SHA-256: `41f7dc1f720767fa78fa20dd13ea034b817bbf6ebd23dfd1324c647499c9c1ba`）。
 - **外部协议 Hook 模块**：已自行获取并安装生效（如 `com.roro.tablethook`）。
 
-### 2. 环境自检 (Preflight Check)
+#### 2. 环境自检
 通过 USB 调试连接设备，运行环境就绪检查脚本：
 
 ```bash
@@ -49,7 +57,7 @@ bash scripts/preflight_check.sh
 TARGET_USER=999 bash scripts/preflight_check.sh
 ```
 
-### 3. 安装外观辅助模块 (`PadDisguise`)
+#### 3. 安装外观辅助模块 (`PadDisguise`)
 您可以在 GitHub Releases 直接下载预编译的 `com.wx.pad` APK，或自行构建：
 
 ```bash
@@ -60,7 +68,7 @@ adb install -r app/build/outputs/apk/release/app-release.apk
 ```
 安装后，在 Vector/LSPosed 管理器中将目标微信添加到模块作用域（Scope）。
 
-### 4. 认证态白纸重置与登录 (Reset & Login)
+#### 4. 认证态白纸重置与登录
 若先前尝试登录曾遇阻或挂起，必须重置为白纸认证态以消除 `auth_ishold` 阻碍：
 
 ```bash
@@ -75,7 +83,7 @@ bash scripts/quarantine_tinker.sh
 
 ---
 
-## 文档索引 (Documentation)
+### 文档索引
 
 - [权威 5 步扫码登录操作手册 (SOP)](docs/TABLET_LOGIN_SOP.md)
 - [登录成功验收判据与日志特征](docs/TABLET_LOGIN_SUCCESS.md)
@@ -89,6 +97,102 @@ bash scripts/quarantine_tinker.sh
 
 ---
 
-## 许可证 (License)
+### 许可证
 
 本项目采用 [GNU General Public License v3.0 (GPL-3.0)](LICENSE) 开源许可证。
+
+---
+
+## English
+
+### Core Prerequisite & Boundary
+
+> ⚠️ **Core Prerequisite & Boundary Notice**:  
+> This project is a **methodology knowledge base, official APK verification SOP, environment governance toolset, and appearance disguise helper** for running WeChat in secondary Android tablet mode. **It is NOT a login entitlement granting tool!**  
+> WeChat server-side secondary tablet login entitlement decision logic relies **exclusively on an external protocol Hook** (such as the community closed-source `com.roro.tablethook` or proprietary user-developed reverse-engineered hooks). The open-source `PadDisguise` module included in this repository only handles screen breakpoint (`sw600dp`) disguise and portrait orientation locking to solve phone layout and rotation quirks. It contains **no** login entitlement granting code whatsoever. For detailed specifications, refer to [`docs/EXTERNAL_HOOK_SPEC.md`](docs/EXTERNAL_HOOK_SPEC.md).
+
+---
+
+### Fragility & Maintenance Lifecycle Warning
+
+> ⚠️ **High Fragility Warning**:  
+> This solution is tightly coupled to Tencent server-side tablet qualification checks and WeChat major client release lifecycles. WeChat typically rolls out mandatory `force_update` directives for legacy clients every 6 to 12 months. Once the official `8.0.78` base build is rejected server-side, this setup will become obsolete unless the community continues reverse engineering newer releases.
+
+---
+
+### Scope & Positioning (What it IS & What it is NOT)
+
+#### What it IS
+1. **Official APK Verification SOP & Clean Auth State Reset**: Hash verification procedures for the battle-tested official release (`8.0.78 / 0x28004e32`) and automated clean-slate authentication reset tooling.
+2. **Open-Source Appearance Disguise Module (`PadDisguise`)**: Overrides `Build.MODEL` and system device identifiers, disguises `smallestScreenWidthDp >= 600`, and enforces portrait orientation to prevent UI distortion on phone form factors.
+3. **One-Click Preflight & Operational Scripts**: Automated verification for Root, Zygisk, Vector API-102 framework, Tinker hotfix isolation, and safe backup/rollback.
+
+#### What it is NOT
+1. **NOT a Login Bypass or Entitlement Tool**: A functional external protocol hook is strictly required to pass secondary QR code tablet verification.
+2. **Contains NO Chat Sniffing or Assistant Automation**: Data export and pipeline processing belong to the independent sibling project [`wechat-pad-exporter`](https://github.com/yaping-pro/wechat-pad-exporter).
+3. **Distributes NO Proprietary WeChat Binaries**: No modified WeChat APKs or proprietary bytecodes are distributed here; see [`NO_PROPRIETARY_BINARIES.md`](NO_PROPRIETARY_BINARIES.md).
+
+---
+
+### Quick Start
+
+#### 1. Prerequisites
+- **Rooted Android Device** (Magisk 27+ or KernelSU).
+- **Zygisk + Vector Framework**: **Vector v2.2+ (API-102)** is strongly recommended to prevent legacy LSPosed API-100 reflection constructor crashes.
+- **Official WeChat APK Base**: Official release `8.0.78` (SHA-256: `41f7dc1f720767fa78fa20dd13ea034b817bbf6ebd23dfd1324c647499c9c1ba`).
+- **External Protocol Hook**: Acquired and installed separately (e.g. `com.roro.tablethook`).
+
+#### 2. Environment Preflight Check
+Connect your device via ADB and execute the preflight inspection script:
+
+```bash
+# Check primary user profile (User 0)
+bash scripts/preflight_check.sh
+
+# If running inside a dual-app / clone profile (e.g. MIUI User 999)
+TARGET_USER=999 bash scripts/preflight_check.sh
+```
+
+#### 3. Build & Install Appearance Helper (`PadDisguise`)
+You can download prebuilt APKs from GitHub Releases or compile from source:
+
+```bash
+# Local Gradle build
+./gradlew assembleRelease
+# Install to device
+adb install -r app/build/outputs/apk/release/app-release.apk
+```
+After installation, enable the module and add WeChat to its scope in Vector / LSPosed Manager.
+
+#### 4. Clean Auth Reset & QR Login
+If previous login attempts stalled or hit server holds, reset to a clean-slate auth state to clear `auth_ishold`:
+
+```bash
+# Reset auth state (safely backs up previous credentials)
+bash scripts/reset_wechat_auth.sh
+
+# Quarantine background-pushed Tinker Beta hotfix patches
+bash scripts/quarantine_tinker.sh
+```
+
+Open WeChat, navigate to the QR code login interface, and scan it with your primary mobile phone to complete tablet-mode dual login!
+
+---
+
+### Documentation
+
+- [Authoritative 5-Step QR Login SOP](docs/TABLET_LOGIN_SOP.md)
+- [Login Acceptance Criteria & Log Signatures](docs/TABLET_LOGIN_SUCCESS.md)
+- [External Protocol Hook Specification & Hook Targets](docs/EXTERNAL_HOOK_SPEC.md)
+- [Dual-Module Coexistence & Toggle Configuration](docs/COEXIST_ANALYSIS.md)
+- [Troubleshooting Guide](docs/TROUBLESHOOTING.md)
+- [Framework & System Compatibility Notes](docs/COMPATIBILITY.md)
+- [No Proprietary Binaries Statement](NO_PROPRIETARY_BINARIES.md)
+- [Disclaimer](DISCLAIMER.md)
+- [Security Policy](SECURITY.md)
+
+---
+
+### License
+
+Distributed under the [GNU General Public License v3.0 (GPL-3.0)](LICENSE).
