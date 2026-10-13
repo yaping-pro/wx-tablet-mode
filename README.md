@@ -31,7 +31,7 @@
 > **重要声明 (Crucial Prerequisite & Boundary)**：  
 > 1. **内置第一方 Pad 登录资格 Hook (v1.0.2+)**：自 `v1.0.2` 起，本项目实现**真正自包含**——在开源模块中内置了纯开源、干净实现的 `PadLoginHook`（基于 LuckyPray/DexKit 动态特征匹配）。它动态定位并拦截微信平板环境检测（`inTabletEnv`）与副设备扫码预检协程（`checkloginaspad`），**单 APK 即可完整赋予平板扫码同登资格，彻底无需任何未授权或闭源第三方 APK**。  
 > 2. **本项目包含什么**：开源模块 `com.wx.pad` 同时包含外观与断点伪装（`PadDisguise`，伪装 `sw600dp` 与强制竖屏锁定）与副设备登录资格赋予（`PadLoginHook`），并配套提供官方底包哈希校验、白纸认证态重置与守护自愈脚本。外部第三方 Hook 现已转为**完全可选的兼容项**（若偏好使用外部 Hook，可通过系统属性 `persist.wx.pad.loginhook 0` 随时切换，详见 [`docs/EXTERNAL_HOOK_SPEC.md`](docs/EXTERNAL_HOOK_SPEC.md)）。  
-> 3. **数据导出伴侣**：如需只读导出微信聊天记录接入 AI 助理，请搭配使用兄弟项目 [`wechat-pad-exporter`](https://github.com/yaping-pro/wechat-pad-exporter)。  
+> 3. **数据导出伴侣**：如需只读导出微信聊天记录接入 AI 助理，请搭配使用兄弟项目 [`wx-pad-exporter`](https://github.com/yaping-pro/wx-pad-exporter)。  
 > 4. **法律与合规诚实声明**：本项目属于个人设备上的系统适配与逆向工程研究，**绝不分发或修改任何微信专有二进制，亦不包含任何第三方专有代码**。模块在运行时 Hook 商业专有软件，仅供使用者在个人合法拥有的硬件与账号上用于学习与研究；使用者须自行对遵守《微信个人账号使用规范》与服务条款承担全部责任。  
 > 5. **物理安卓平板同样需要 Root（关键说明）**：本项目所有能力（`PadDisguise`、`PadLoginHook`、认证态治理、数据导出伴侣）均以 Xposed/LSPosed 模块形态运行，底层强依赖 Root（Magisk 或 KernelSU）+ Zygisk + LSPosed/Vector。即便是一台“原生支持微信平板副设备登录”的物理安卓平板，本项目模块**仍必须运行在已 Root 的设备上**才能生效；**若平板未 Root，整套流水线将无法部署。**
 
@@ -45,7 +45,7 @@
 | ② | **Zygisk + LSPosed 或 Vector** | 推荐 Vector v2.2+（API-102，无参构造 `XposedModule()`）；旧版 LSPosed (API-100) 亦受支持。二者只保留其一，避免 Zygote 竞争崩溃。 |
 | ③ | **官方微信 `8.0.78 / 0x28004e32`** | MD5 `846b411199ae49d335d31b3a17036440`；SHA-256 `41f7dc1f720767fa78fa20dd13ea034b817bbf6ebd23dfd1324c647499c9c1ba`。Beta 版（`0x28004e38`）会被服务端拦截。 |
 | ④ | **平板登录资格 Hook（✅ 已内置，无需第三方）** | **内置于当前模块 `com.wx.pad`**（`PadLoginHook`）。安装本模块并勾选 `com.tencent.mm` 作用域即可自动生效。亦支持保留用户自选的外部 Hook。 |
-| ⑤ | **（可选）数据导出伴侣仓库** | 仅当你需要把聊天流只读导出到 AI 助理时，再搭配 [`wechat-pad-exporter`](https://github.com/yaping-pro/wechat-pad-exporter)。与登录资格无关。 |
+| ⑤ | **（可选）数据导出伴侣仓库** | 仅当你需要把聊天流只读导出到 AI 助理时，再搭配 [`wx-pad-exporter`](https://github.com/yaping-pro/wx-pad-exporter)。与登录资格无关。 |
 
 > 🤖 **交给 AI Agent 自动部署？** 本仓库提供 [`AGENT.md`](AGENT.md)：你只需 Root 设备、开启 USB 调试、插上电脑，然后让任意具备 shell 权限的编码 Agent（omp / Claude Code / Codex）读取并执行 [`AGENT.md`](AGENT.md) 即可端到端自动完成部署与校验。
 
@@ -119,7 +119,7 @@ cd wx-tablet-mode
 | **第一方登录资格 Hook (`PadLoginHook`)** | ✅ **包含** | 基于 DexKit 动态扫描并拦截环境检测与登录协程，实现自包含副设备登录 |
 | **运维与自愈工具** | ✅ 包含 | 提供 Tinker 热更补丁隔离、认证态白纸重置及多用户环境自检 |
 | **外部协议 Hook 兼容模式** | ✅ 包含 | 具备系统属性软开关，可平滑回退至第三方 Hook（详见 [`docs/EXTERNAL_HOOK_SPEC.md`](docs/EXTERNAL_HOOK_SPEC.md)） |
-| **聊天记录嗅探 / AI 导出** | ❌ **不包含** | 独立数据管道请参阅 [`wechat-pad-exporter`](https://github.com/yaping-pro/wechat-pad-exporter) |
+| **聊天记录嗅探 / AI 导出** | ❌ **不包含** | 独立数据管道请参阅 [`wx-pad-exporter`](https://github.com/yaping-pro/wx-pad-exporter) |
 | **微信专有二进制分发** | ❌ **不包含** | 绝不分发修改版或专有微信底包，详见 [`NO_PROPRIETARY_BINARIES.md`](NO_PROPRIETARY_BINARIES.md) |
 
 ---
@@ -234,7 +234,7 @@ TARGET_USER=999 bash scripts/preflight_check.sh
 > **Crucial Notice (Prerequisite & Scope Boundary)**:  
 > 1. **First-Party Pad Login Hook Built-In (v1.0.2+)**: Starting with `v1.0.2`, this repository is **genuinely self-contained** — shipping our own clean-room, GPL-3.0 implementation of `PadLoginHook` (powered dynamically by LuckyPray/DexKit). It intercepts WeChat's tablet environment check (`inTabletEnv`) and secondary-device pre-qualification coroutine (`checkloginaspad`) at runtime, granting tablet QR scan-login eligibility in a **single APK with zero dependency on unlicensed third-party binaries**.  
 > 2. **What this repository provides**: The open-source `com.wx.pad` module provides BOTH appearance disguise (`PadDisguise`, `sw600dp` breakpoint and portrait locking) AND pad-login qualification (`PadLoginHook`), alongside official APK verification and self-healing governance scripts. Third-party external hooks are now **entirely optional** (and can be toggled via `persist.wx.pad.loginhook 0`; see [`docs/EXTERNAL_HOOK_SPEC.md`](docs/EXTERNAL_HOOK_SPEC.md)).  
-> 3. **Chat Stream Export**: For read-only chat export to AI assistants, see companion project [`wechat-pad-exporter`](https://github.com/yaping-pro/wechat-pad-exporter).  
+> 3. **Chat Stream Export**: For read-only chat export to AI assistants, see companion project [`wx-pad-exporter`](https://github.com/yaping-pro/wx-pad-exporter).  
 > 4. **Legal & Compliance Honesty**: This project is personal technical research into Android system adaptation and runtime hooking on personal hardware. **It distributes zero proprietary WeChat binaries and zero closed-source third-party binaries.** Hooking commercial proprietary applications carries account risk; users are solely responsible for compliance with WeChat Terms of Service.  
 > 5. **A physical Android tablet STILL needs Root**: Every capability in this project runs as an Xposed/LSPosed module, which fundamentally requires Root (Magisk or KernelSU) + Zygisk + LSPosed/Vector. Even on a physical tablet, this module **must run on a rooted device** to be installed; **an unrooted tablet cannot deploy the pipeline.**
 
@@ -248,7 +248,7 @@ TARGET_USER=999 bash scripts/preflight_check.sh
 | ② | **Zygisk + LSPosed or Vector** | Vector v2.2+ (API-102, no-arg `XposedModule()`) recommended; legacy LSPosed (API-100) also supported. Keep only one active to avoid Zygote injection races. |
 | ③ | **Official WeChat `8.0.78 / 0x28004e32`** | MD5 `846b411199ae49d335d31b3a17036440`; SHA-256 `41f7dc1f720767fa78fa20dd13ea034b817bbf6ebd23dfd1324c647499c9c1ba`. The Beta build (`0x28004e38`) is rejected by the server. |
 | ④ | **Pad-login hook (✅ Built-in, no third-party APK needed)** | **Built directly into `com.wx.pad`** (`PadLoginHook`). Simply install our module and enable scope for `com.tencent.mm`. Users may still bring their own external hook if preferred. |
-| ⑤ | **(Optional) companion export repo** | Only if you want to read-only export chat streams to an AI assistant, pair with [`wechat-pad-exporter`](https://github.com/yaping-pro/wechat-pad-exporter). Unrelated to login entitlement. |
+| ⑤ | **(Optional) companion export repo** | Only if you want to read-only export chat streams to an AI assistant, pair with [`wx-pad-exporter`](https://github.com/yaping-pro/wx-pad-exporter). Unrelated to login entitlement. |
 
 > 🤖 **Hand setup to an AI agent?** This repo ships [`AGENT.md`](AGENT.md): just root the device, enable USB debugging, plug it in, then let any shell-capable coding agent (omp / Claude Code / Codex) read and execute [`AGENT.md`](AGENT.md) to complete the whole deployment and verification end-to-end.
 
@@ -322,7 +322,7 @@ cd wx-tablet-mode
 | **First-Party Pad Login Hook (`PadLoginHook`)** | ✅ **Included** | Dynamic DexKit matchers for environment and CGI pre-qualification checks |
 | **Governance & Self-Healing Tooling** | ✅ Included | Tinker patch isolation, clean-slate auth reset, and multi-user preflight |
 | **External Protocol Hook Compatibility** | ✅ Included | System property toggles allow smooth fallback to user-supplied hooks |
-| **Chat Stream Sniffing & AI Pipeline** | ❌ **Excluded** | Dedicated export pipeline is handled in [`wechat-pad-exporter`](https://github.com/yaping-pro/wechat-pad-exporter) |
+| **Chat Stream Sniffing & AI Pipeline** | ❌ **Excluded** | Dedicated export pipeline is handled in [`wx-pad-exporter`](https://github.com/yaping-pro/wx-pad-exporter) |
 | **Proprietary WeChat Binary Distribution** | ❌ **Excluded** | Strictly distributes zero modified WeChat APKs; see [`NO_PROPRIETARY_BINARIES.md`](NO_PROPRIETARY_BINARIES.md) |
 
 ---
