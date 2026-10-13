@@ -1,7 +1,7 @@
 # wx-tablet-mode (微信安卓平板模式辅助与环境治理套件)
 
 [![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
-[![Build APK](https://github.com/steven/wx-tablet-mode/actions/workflows/build-apk.yml/badge.svg)](.github/workflows/build-apk.yml)
+[![Build APK](https://github.com/yaping-pro/wx-tablet-mode/actions/workflows/build-apk.yml/badge.svg)](.github/workflows/build-apk.yml)
 
 > ⚠️ **核心前置声明 (Core Prerequisite & Boundary)**:  
 > 本项目是**微信安卓平板副设备登录的【方法论智库、官方包校验 SOP、环境治理脚本与外观伪装辅助件】**，**绝非登录资格授予工具**！  
