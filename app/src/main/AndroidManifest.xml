@@ -3,7 +3,7 @@
 
     <application
         android:allowBackup="false"
-        android:label="WX Tablet Mode Disguise"
+        android:label="WX Tablet Mode"
         android:supportsRtl="true">
 
         <meta-data
@@ -11,7 +11,7 @@
             android:value="true" />
         <meta-data
             android:name="xposeddescription"
-            android:value="WeChat Android Tablet Appearance Disguise &amp; Portrait Lock Helper" />
+            android:value="WeChat Android Tablet Mode: Appearance Disguise, Portrait Lock &amp; Pad Login Hook"
         <meta-data
             android:name="xposedminversion"
             android:value="82" />

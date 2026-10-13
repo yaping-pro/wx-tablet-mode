@@ -29,8 +29,8 @@ This project (`wx-tablet-mode`) **DOES NOT include, distribute, or host any prop
 
 ---
 
-## 2. 外部依赖说明 (External Dependencies)
+## 2. 纯开源自包含实现与第三方专有二进制排斥声明 (Zero Third-Party Closed-Source Binaries)
 
-本项目中的 `PadDisguise` 模块仅负责屏幕断点与竖屏锁定辅助，**不具备**微信平板副设备登录资格判决能力。
+本项目自 v1.0.2 起内置了第一方、遵循 GPL-3.0 许可证的 `PadLoginHook` 与 `PadDisguise`，所有模块逻辑均为第一方公开源码构建。
 
-平板登录资格所需之协议 Hook（如 `com.roro.tablethook` 或用户自研逆向实现）属于外部第三方独立组件。本项目**不分发**任何第三方闭源 Hook APK，请根据 [`docs/EXTERNAL_HOOK_SPEC.md`](docs/EXTERNAL_HOOK_SPEC.md) 自行甄别并配置外部依赖。
+本项目**严禁且绝不分发、不托管任何未授权或闭源的第三方 APK**（包括社区流传的未声明开源许可证的 `com.roro.tablethook` / `tablethook.apk`）。用户仅需编译或下载由本仓库构建的单一开源 APK。如用户偏好使用外部 Hook，亦可通过系统属性软开关自由切换，但须自行甄别并合法获取其外部依赖。

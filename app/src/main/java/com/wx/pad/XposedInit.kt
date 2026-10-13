@@ -7,10 +7,9 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage
 
 /**
  * XposedInit serves as the main entry point for the LSPosed/Vector module.
- * It intercepts the WeChat application lifecycle and initializes PadDisguise.
- *
- * NOTE: Login qualification is NOT handled here. This module only provides
- * appearance/layout spoofing (sw600dp breakpoint and portrait locking).
+ * Intercepts the WeChat application lifecycle to initialize:
+ * 1. PadDisguise (appearance, layout breakpoints sw600dp, portrait locking)
+ * 2. PadLoginHook (first-party pad-login qualification hook via DexKit)
  */
 class XposedInit : IXposedHookLoadPackage {
 
@@ -28,12 +27,17 @@ class XposedInit : IXposedHookLoadPackage {
         Log.i(TAG, "Initializing WX-Tablet-Mode in process: $processName (package: ${lpparam.packageName})")
 
         try {
-            // Apply Pad disguise and portrait lock.
+            // 1. Apply Pad disguise and portrait lock.
             // PadDisguise is gated by the system property persist.wx.pad.disguise
             // (default enabled; set to "0" to disable without recompiling).
             PadDisguise.apply(lpparam)
 
-            Log.i(TAG, "WX-Tablet-Mode disguise initialized successfully for $processName")
+            // 2. Apply built-in Pad login qualification hook.
+            // PadLoginHook is gated by the system property persist.wx.pad.loginhook
+            // (default enabled; set to "0" to disable without recompiling).
+            PadLoginHook.apply(lpparam)
+
+            Log.i(TAG, "WX-Tablet-Mode module initialized successfully for $processName")
         } catch (e: Throwable) {
             Log.e(TAG, "Fatal error initializing WX-Tablet-Mode: ${e.message}", e)
         }

@@ -1,67 +1,80 @@
-# External Protocol Hook Specification (外部协议 Hook 依赖规范)
+# Hook Specification: Built-in & External Protocol Hooks (协议 Hook 规范)
 
-## 1. 核心定位与职责契约 (Role & Boundary)
+## 1. 核心定位与版本演进 (Role & Architecture Evolution)
 
-本项目（`wx-tablet-mode`）明确界定自身技术边界：
+在早期版本（v1.0.0 ~ v1.0.1）中，`wx-tablet-mode` 仅提供 `PadDisguise`（屏幕断点 `sw600dp` 伪装与竖屏锁定），平板副设备登录资格依赖用户自备外部第三方 Hook（如社区未声明开源许可证的 `com.roro.tablethook`）。
 
-- **自研开源模块 `PadDisguise` (`com.wx.pad`)**:
-  仅负责 Android 系统属性（`Build.MODEL`、`Build.DEVICE` 等）伪装、屏幕断点伪装（`smallestScreenWidthDp >= 600`、`SCREENLAYOUT_SIZE_XLARGE`）以及竖屏强制锁定，解决手机端界面分栏与排版问题。
-- **登录资格授予 (Tablet Secondary Device Qualification)**:
-  微信服务端判定当前客户端是否具备副设备扫码登录资格（返回扫码授权界面而非强制手机号密码踢出主力机），依赖**外部协议 Hook 模块**。
-
-本项目**绝不分发、不内置、亦不修改**任何外部协议 Hook 二进制文件。
+**自 v1.0.2 起，本项目全面实现第一方、自包含（Self-Contained）的纯开源方案**：
+- **单一 APK 同时具备伪装与登录资格**：模块源码内置全新 `PadLoginHook` 组件，基于 LuckyPray/DexKit 动态特征匹配与拦截，直接赋予微信副设备扫码登录资格。
+- **100% 纯开源与洁癖合规**：绝不打包、不分发任何第三方未授权闭源 APK（如 `tablethook.apk`）或腾讯专有二进制。所有逻辑均为遵循 GPL-3.0 的第一方源码实现。
+- **外部 Hook 转为可选（Optional）兼容模式**：如果用户仍偏好使用自己编译或第三方提供的外部 Hook，可通过系统属性软开关一键禁用内置 Hook。
 
 ---
 
-## 2. 外部依赖模块特征与自检 (Dependency Characteristics & Verification)
+## 2. 内置 Hook 技术实现与靶点剖析 (`PadLoginHook`)
 
-经过广泛技术验证与测试，以下为典型的外部协议 Hook 运行特征（以社区流传的 `com.roro.tablethook` 为参考基线）：
+`com.wx.pad.PadLoginHook` 借鉴了开源项目 `Houvven/I-Am-Pad`（GPL-3.0）的成熟靶点与架构设计，借助 `LuckyPray/DexKit`（LGPL-3.0）在微信运行时动态定位混淆方法，无硬编码类名，具备极佳的跨小版本兼容性：
 
-### 2.1 包名与组件标识
-- **Package Name**: `com.roro.tablethook`（或用户自研具备等价能力的 Xposed 模块）
-- **框架支持**: 需要基于 **API-102 (无参构造 `XposedModule()`)** 的现代 Xposed 运行时，如 **Vector v2.2+**。若在早期 LSPosed (API-100) 环境中运行，会因反射带参构造失败抛出 `NoSuchMethodException`。
+### 2.1 靶点一：平板/折叠屏环境判定 (`inTabletEnv`)
+- **匹配规则**：在 `com.tencent.mm` 进程中扫描包含常数字符串 `"inTabletEnv"` 的 `public static boolean` 方法。
+- **备选规则**：若主规则未命中，回退扫描 `com.tencent.mm.ui` 包中包含折叠屏特征字串（`royole`、`ro.os_foldable_screen_support`）的静态布尔方法。
+- **拦截行为**：通过 Xposed `beforeHookedMethod` 强制短路返回 `true`。
 
-### 2.2 核心行为特征与 Logcat 识别
-当外部协议 Hook 正常注入并生效时，启动 WeChat（`com.tencent.mm`）进程可在 Logcat 中观察到如下特征日志：
+### 2.2 靶点二：副设备扫码资格预检协程 (`checkloginaspad`)
+- **匹配规则**：扫描参数列表为 `(String, String, Continuation)`、返回值为 `Object`，且常量池包含接口路径 `"/cgi-bin/micromsg-bin/checkloginaspad"`（类标识 `MicroMsg.CgiCheckLoginAsPad`）的协程方法。
+- **拦截行为**：通过 Xposed `beforeHookedMethod` 强制短路返回 `true`（放行副设备资格判定）。
+
+### 2.3 执行时机与防竞争保护
+Hook 在 `TinkerApplication.onBaseContextAttached` / `Application.onCreate` 时触发，确保微信 BaseDexClassLoader 与内存 Dex 全部挂载后执行 DexKit 扫描，并在匹配完成后立即释放 DexKit 原生句柄，保持进程内存整洁。
+
+---
+
+## 3. 生效日志特征 (Logcat Verification)
+
+当内置 `PadLoginHook`（或外部兼容 Hook）成功注入并生效时，启动微信主进程可在 Logcat 捕获到标准特征信号：
 
 ```text
-DexKit 微信平板判定候选：关键词=2，签名=1
-微信副设备登录资格候选：关键词=1，签名=1
-微信平板登录模式已启用
+I TabletHook: com.wx.pad: DexKit 微信平板判定候选：关键词=2，签名=1
+I TabletHook: com.wx.pad: DexKit 微信副设备登录资格候选：关键词=1，签名=1
+I TabletHook: com.wx.pad: 微信平板登录模式已启用
 ```
 
-若 Logcat 中未出现上述日志，表明外部 Hook 尚未正确加载或未命中当前微信版本的目标方法。
-
-### 2.3 内存 maps 验证
-可通过 root shell 检查 WeChat 进程的内存映射，确认 Hook 模块及 native 库是否加载：
-
+验证命令：
 ```bash
-su -c 'grep -E "tablethook|libdexkit" /proc/$(pidof com.tencent.mm)/maps'
+adb logcat -d | grep -E "微信平板登录模式已启用|微信副设备登录资格候选|微信平板判定候选" | tail -20
 ```
 
 ---
 
-## 3. 多模块共存与开关配置 (Coexistence & Collision Prevention)
+## 4. 双轨共存与运行时开关 (Coexistence & Toggles)
 
-当同时安装外部协议 Hook 模块与本项目的 `PadDisguise` 时，两者可能在 `Build.MODEL` 或 `Configuration` 的 Hook 点发生竞争（Last-writer-wins）。
+本项目设计了极简的 Android 系统属性软开关（`setprop`），无需重新编译或卸载 APK 即可灵活调控：
 
-### 3.1 运行时开关机制
-`PadDisguise` 提供了系统属性软开关：
-- **默认状态**: 开启（`persist.wx.pad.disguise` 未设置或为 `1`）。
-- **关闭外观伪装 (独占模式)**:
-  若外部 Hook 自身已完整覆写了设备型号与屏幕断点，建议关闭 `PadDisguise` 的伪装，使外部 Hook 独占生效：
-  ```bash
-  su -c 'setprop persist.wx.pad.disguise 0'
-  ```
-  设置后强制停止并重启微信即可生效，无需重新编译或卸载 APK。
+| 系统属性 (Property) | 默认值 | 作用说明 | 切换命令 |
+| :--- | :---: | :--- | :--- |
+| `persist.wx.pad.loginhook` | `1` (启用) | 控制内置 `PadLoginHook` 登录资格拦截器。设为 `0` 则停用内置资格 Hook，便于回退至外部第三方 Hook（如 `com.roro.tablethook`）。 | `su -c 'setprop persist.wx.pad.loginhook 0'` |
+| `persist.wx.pad.disguise` | `1` (启用) | 控制 `PadDisguise` 外观与断点伪装（Build 字段与 `sw600dp`）。设为 `0` 则停用外观伪装，由外部模块独占伪装。 | `su -c 'setprop persist.wx.pad.disguise 0'` |
+
+修改属性后，通过 `am force-stop com.tencent.mm` 重启微信即可即时生效。
 
 ---
 
-## 4. 获取与部署提示 (User Instructions)
+## 5. 外部第三方 Hook 的兼容与配置（可选备用路径）
 
-1. 用户须自行通过合法开源社区、自主逆向研发或可信第三方获取适配目标微信版本的协议 Hook 模块。
-2. 安装外部 Hook 模块后，在 Android 多用户 / 双开环境下（如 User 999），务必执行分身补装：
+若您出于历史兼容需求选择使用外部独立 Hook（如 `com.roro.tablethook`）：
+1. 建议先关闭内置登录资格 Hook 避免重复拦截：
    ```bash
-   pm install-existing --user <TARGET_USER> <HOOK_PACKAGE_NAME>
+   su -c 'setprop persist.wx.pad.loginhook 0'
    ```
-3. 在 Vector / Xposed 框架管理界面中，将目标用户下的 `com.tencent.mm` 勾选至模块作用域 (Scope)。
+2. 安装外部 Hook APK 并确保在 Vector / LSPosed 管理器中将其勾选至 `com.tencent.mm` 作用域；
+3. 在 Android 多用户 / 分身空间（如 User 999）下，务必向分身用户补装：
+   ```bash
+   pm install-existing --user <TARGET_USER> <EXTERNAL_HOOK_PKG>
+   ```
+
+---
+
+## 6. 法律合规与诚实声明 (Legal Honesty)
+
+- **第一方干净实现**：本仓库分发的 APK 及其所有源码均系纯开源代码与标准开源库（GPL-3.0 / LGPL-3.0），**不包含任何闭源反编译代码或未授权第三方二进制**。
+- **协议 Hook 风险与责任**：在内存中拦截并修改专有商业软件（微信）的设备校验逻辑属于逆向工程研究范畴，仅供用户在个人所有的设备与账号上进行合法学习与测试。用户须自行承担违反《腾讯微信软件许可及服务协议》可能导致的账号受限风险。

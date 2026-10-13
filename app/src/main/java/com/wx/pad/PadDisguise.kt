@@ -18,11 +18,9 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage
  * - Forces portrait orientation so UI remains usable on standard phone screens
  *
  * IMPORTANT CONTRACT BOUNDARY:
- * PadDisguise does NOT grant WeChat tablet secondary-device login qualification.
- * Core login qualification requires an external protocol hook (such as com.roro.tablethook
- * or user-supplied reverse-engineered hook). PadDisguise handles only appearance,
- * layout breakpoints (sw600dp), and screen orientation locking.
- */
+ * PadDisguise specifically handles appearance, layout breakpoints (sw600dp), and screen
+ * orientation locking. Tablet secondary-device login qualification is handled by sibling
+ * component [PadLoginHook] (or alternatively an external protocol hook if desired).
 object PadDisguise {
     private const val TAG = "WX-PadDisguise"
 
@@ -31,11 +29,10 @@ object PadDisguise {
      *
      * WHY THIS EXISTS: PadDisguise spoofs Build.MODEL/DEVICE/PRODUCT/MANUFACTURER and
      * Configuration.smallestScreenWidthDp/screenLayout. When coexisting with an external
-     * protocol hook (such as `com.roro.tablethook`), their spoofing hooks may collide
-     * (last-writer-wins on static fields / before-Hook args). To allow coexisting safely
-     * without recompiling, this disguise can be disabled at runtime via system property,
+     * protocol hook (such as `com.roro.tablethook` or standalone modules), their spoofing hooks
+     * may collide (last-writer-wins on static fields / before-Hook args). To allow coexisting
+     * safely without recompiling, this disguise can be disabled at runtime via system property,
      * allowing the external hook to own all spoofing exclusively.
-     *
      * Default: ENABLED.
      * Disable at runtime (no recompile / no reinstall of APK needed):
      *   su -c 'setprop persist.wx.pad.disguise 0'

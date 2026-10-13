@@ -83,22 +83,21 @@ if [[ "$FRAMEWORK_OK" -eq 0 ]]; then
   echo "[!] WARNING: Neither Vector nor LSPosed found under /data/adb/modules/."
 fi
 
-# Check External Protocol Hook module (e.g. com.roro.tablethook)
-HOOK_INSTALLED=$($ADB_CMD shell "pm list packages --user $TARGET_USER com.roro.tablethook" 2>/dev/null | tr -d '\r' || true)
-if [[ -n "$HOOK_INSTALLED" ]]; then
-  echo "[+] External tablet protocol hook: com.roro.tablethook installed for user $TARGET_USER"
-else
-  echo "[!] NOTE: com.roro.tablethook NOT found for user $TARGET_USER."
-  echo "    Remember: wx-tablet-mode does NOT grant login privileges."
-  echo "    Ensure your external protocol hook is installed and scoped."
-fi
-
-# Check PadDisguise module
+# Check WX-Tablet-Mode module (com.wx.pad — built-in disguise + pad-login hook)
 PAD_INSTALLED=$($ADB_CMD shell "pm list packages --user $TARGET_USER com.wx.pad" 2>/dev/null | tr -d '\r' || true)
 if [[ -n "$PAD_INSTALLED" ]]; then
-  echo "[+] PadDisguise helper: com.wx.pad installed for user $TARGET_USER"
+  echo "[+] WX-Tablet-Mode (com.wx.pad): INSTALLED for user $TARGET_USER (provides disguise + pad-login hook)"
 else
-  echo "[*] PadDisguise helper (com.wx.pad) not installed yet (optional layout helper)."
+  echo "[!] NOTE: com.wx.pad not installed yet. Install wx-tablet-mode APK to activate."
+fi
+
+# Check Optional External Protocol Hook module (e.g. com.roro.tablethook)
+HOOK_INSTALLED=$($ADB_CMD shell "pm list packages --user $TARGET_USER com.roro.tablethook" 2>/dev/null | tr -d '\r' || true)
+if [[ -n "$HOOK_INSTALLED" ]]; then
+  echo "[+] Optional external tablet hook: com.roro.tablethook installed for user $TARGET_USER"
+  if [[ -n "$PAD_INSTALLED" ]]; then
+    echo "    (Both com.wx.pad and com.roro.tablethook are present. Set persist.wx.pad.loginhook=0 if you prefer external hook exclusively)."
+  fi
 fi
 
 echo "=========================================================="

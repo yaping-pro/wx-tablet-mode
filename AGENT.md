@@ -11,12 +11,13 @@
 
 ## 0. Hard gates & safety rails (read first — never violate)
 
-1. **You do NOT grant login entitlement.** The pad-login entitlement comes **only** from a user-supplied
-   external protocol hook (e.g. `com.roro.tablethook`). This repo ships `PadDisguise` (appearance) and
-   governance scripts only. See [`docs/EXTERNAL_HOOK_SPEC.md`](docs/EXTERNAL_HOOK_SPEC.md).
-2. **HARD GATE — external hook must be present**: before declaring success, you MUST verify the external
-   hook package is installed and scoped. If it is absent, STOP and tell the user to obtain it (point to
-   [`docs/EXTERNAL_HOOK_SPEC.md`](docs/EXTERNAL_HOOK_SPEC.md)). Never pretend to install or fabricate it.
+1. **Self-contained pad-login qualification (v1.0.2+)**: this repo ships `com.wx.pad` containing BOTH
+   `PadDisguise` (appearance) and `PadLoginHook` (first-party qualification hook via DexKit). Installing
+   our single APK satisfies the pad-login entitlement; external hooks (e.g. `com.roro.tablethook`) are
+   now **optional** compatibility fallbacks. See [`docs/EXTERNAL_HOOK_SPEC.md`](docs/EXTERNAL_HOOK_SPEC.md).
+2. **HARD GATE — pad hook must be present & scoped**: before declaring success, you MUST verify that either
+   (a) our module `com.wx.pad` is installed and scoped to `com.tencent.mm`, OR (b) an external hook (e.g.
+   `com.roro.tablethook`) is installed and scoped. If neither is installed, STOP and install our APK.
 3. **Never `am force-stop` a WeChat that is already logged in** for the target user — it breaks the live
    pad session. `scripts/reset_wechat_auth.sh` force-stops only as part of a *clean-slate reset*, which is
    only appropriate on a device that is **not** in a working logged-in state.
@@ -57,7 +58,7 @@ Then assert each item explicitly and **report what is MISSING with remediation**
 | Magisk/KernelSU | `adb shell su -c 'test -d /data/adb/modules && echo ok'` | `ok` | Install Magisk/KernelSU |
 | Zygisk + LSPosed/Vector | `adb shell su -c 'test -d /data/adb/modules/zygisk_vector -o -d /data/adb/modules/zygisk_lsposed && echo ok'` | `ok` | Install Zygisk + Vector (API-102) or LSPosed and enable Zygisk |
 | Official WeChat build | `adb shell su -c 'md5sum "$(pm path --user "$TARGET_USER" com.tencent.mm | sed s/package://)"'` | MD5 `846b411199ae49d335d31b3a17036440` | See Step 2 (verify/install official `8.0.78 / 0x28004e32`) |
-| External hook present | `adb shell pm list packages --user "$TARGET_USER" com.roro.tablethook` | prints the package | **HARD GATE** → STOP, tell user to install+scope the hook (see `docs/EXTERNAL_HOOK_SPEC.md`) |
+| Pad hook present | `adb shell pm list packages --user "$TARGET_USER" com.wx.pad` | prints package (or `com.roro.tablethook` if external) | **HARD GATE** → install `wx-tablet-mode-v1.0.2-universal.apk` (Step C) |
 
 ---
 
@@ -94,17 +95,17 @@ TARGET_USER="${TARGET_USER:-0}" bash scripts/reset_wechat_auth.sh
 - **Abort condition**: script errors before the verify step.
 - **Idempotent**: ✅ safe to re-run; it only moves stale auth files into a timestamped backup.
 
-### Step C ⚠️ — Install PadDisguise APK + enable scope for `com.tencent.mm`
+### Step C ⚠️ — Install WX-Tablet-Mode APK + enable scope for `com.tencent.mm`
 
 ```bash
 # Prefer the prebuilt release asset; fall back to a locally built APK.
-adb install -r wx-tablet-mode-v1.0.1-universal.apk   # or: app/build/outputs/apk/release/app-release.apk
+adb install -r wx-tablet-mode-v1.0.2-universal.apk   # or: app/build/outputs/apk/release/app-release.apk
 ```
 
 - **Expected output**: `Success`.
-- **Then enable scope**: in LSPosed/Vector Manager → enable module `com.wx.pad` (PadDisguise) →
-  add `com.tencent.mm` to its Scope. (No CLI for this; if a manager exposes an intent/API, use it;
-  otherwise instruct the user — this is the one step requiring a tap in the manager UI.)
+- **Then enable scope**: in LSPosed/Vector Manager → enable module `com.wx.pad` (WX Tablet Mode) →
+  add `com.tencent.mm` to its Scope. This activates BOTH appearance disguise and the built-in pad-login
+  qualification hook (`PadLoginHook`).
 - **Abort condition**: install fails (e.g. device not rooted / module framework missing) → go back to Preflight.
 
 ### Step D ✅ — Quarantine Tinker patches
@@ -117,18 +118,19 @@ TARGET_USER="${TARGET_USER:-0}" bash scripts/quarantine_tinker.sh
 - **Abort condition**: none fatal; warn if patches were found and moved.
 - **Idempotent**: ✅ safe to re-run.
 
-### Step E ✅ — Verify external hook is present (HARD GATE)
+### Step E ✅ — Verify pad hook is present & scoped (HARD GATE)
 
 ```bash
-adb shell pm list packages --user "$TARGET_USER" com.roro.tablethook
-# Also confirm it is scoped in the manager (no CLI; ask user to confirm scope includes com.tencent.mm).
+# Built-in hook (com.wx.pad) or optional external hook (com.roro.tablethook):
+adb shell pm list packages --user "$TARGET_USER" com.wx.pad
+# Optional external hook check (if user disabled built-in via persist.wx.pad.loginhook=0):
+adb shell pm list packages --user "$TARGET_USER" com.roro.tablethook || true
 ```
 
-- **Expected output**: the hook package is listed.
-- **Abort condition (HARD GATE)**: package absent → **STOP**, report:
-  "External pad-login hook not installed. This repo does not ship it. Obtain a compatible hook
-  (see `docs/EXTERNAL_HOOK_SPEC.md`) and scope it to `com.tencent.mm`, then re-run." Do NOT continue.
-
+- **Expected output**: at least one hook package (`com.wx.pad` or `com.roro.tablethook`) is listed.
+- **Abort condition (HARD GATE)**: neither package is present → **STOP**, report:
+  "No pad hook installed. Install `wx-tablet-mode-v1.0.2-universal.apk` (Step C) and scope it to
+  `com.tencent.mm`, then re-run." Do NOT continue.
 ### Step F ⚠️ — Launch QR login
 
 ```bash
@@ -138,7 +140,7 @@ adb shell su -c "am start --user $TARGET_USER -n com.tencent.mm/.ui.LauncherUI"
 ```
 
 - **Expected output**: WeChat launches and shows the **tablet login QR code** (not phone/password login).
-- **Abort condition**: phone/password login appears → external hook not active (re-check Step E) or
+- **Abort condition**: phone/password login appears → hook not active (re-check Step E) or
   wrong WeChat build (re-check Step A).
 
 ---
@@ -160,8 +162,8 @@ adb shell su -c "ls -l /data/user/$TARGET_USER/com.tencent.mm/MicroMsg/autoauth.
 **Report back to the user**:
 1. Device resolved + root/framework asserted (yes/no).
 2. WeChat build verified (`0x28004e32`, MD5 + SHA-256 matched).
-3. External hook present + scoped (package name).
-4. PadDisguise installed + scoped to `com.tencent.mm`.
+3. Pad hook present + scoped (`com.wx.pad` built-in or external hook).
+4. WX Tablet Mode installed + scoped to `com.tencent.mm`.
 5. Tinker patches quarantined (count moved / none).
 6. Login QR shown + `autoauth.cfg` grew to N bytes + logcat signature captured.
 7. Any step that was skipped or needs a human tap (e.g. enabling scope in the manager UI).
@@ -175,7 +177,7 @@ adb shell su -c "ls -l /data/user/$TARGET_USER/com.tencent.mm/MicroMsg/autoauth.
 - Never bind any service to `0.0.0.0` (loopback only).
 - Never delete `/data/adb/service.d` scripts.
 - Ask before flashing/patching any APK.
-- Do not fabricate or install the external hook; verify-only (HARD GATE Step E).
+- Ensure pad hook is installed and scoped (built-in `com.wx.pad` or external; HARD GATE Step E).
 
 ---
 

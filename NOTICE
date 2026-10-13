@@ -1,0 +1,40 @@
+wx-tablet-mode (com.wx.pad)
+Copyright (C) 2026 yaping-pro / wx-tablet-mode contributors
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+================================================================================
+THIRD-PARTY COMPONENTS AND ATTRIBUTIONS
+================================================================================
+
+1. Houvven/I-Am-Pad
+   - Upstream: https://github.com/Houvven/I-Am-Pad
+   - Author: Houvven
+   - License: GNU General Public License v3.0 (GPL-3.0)
+   - Usage: Matcher concepts, CGI path signatures, and coroutine interception
+     design in `PadLoginHook.kt` are derived from Houvven/I-Am-Pad's WeChat
+     hook implementation.
+
+2. LuckyPray/DexKit
+   - Upstream: https://github.com/LuckyPray/DexKit
+   - Author: LuckyPray
+   - License: GNU Lesser General Public License v3.0 (LGPL-3.0)
+   - Usage: Runtime bytecode scanning and method resolution library, dynamically
+     linked via Gradle dependency `org.luckypray:dexkit:2.1.0`.
+
+3. Xposed Framework API
+   - Upstream: https://github.com/rovo89/XposedBridge
+   - Author: rovo89
+   - License: Apache License, Version 2.0
+   - Usage: Module interception bridge API (compileOnly).

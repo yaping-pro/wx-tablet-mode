@@ -1,4 +1,4 @@
-name: Build PadDisguise APK
+name: Build WX-Tablet-Mode APK
 
 on:
   push:
@@ -35,7 +35,7 @@ jobs:
       - name: Prepare Named Release Assets
         run: |
           mkdir -p release-assets
-          TAG_NAME="${GITHUB_REF_NAME:-v1.0.1}"
+          TAG_NAME="${GITHUB_REF_NAME:-v1.0.2}"
           SRC_APK=$(ls app/build/outputs/apk/release/*.apk | head -n 1)
           if [ -z "$SRC_APK" ] || [ ! -f "$SRC_APK" ]; then
             echo "::error::Release APK not found in app/build/outputs/apk/release/"
@@ -64,15 +64,15 @@ jobs:
           body: |
             ## wx-tablet-mode ${{ github.ref_name }}
 
-            微信平板模式 Xposed/LSPosed 伪装模块 (com.wx.pad)。使手机版微信以平板/折叠屏模式运行，支持与另一台手机/电脑同时在线。
+            微信平板模式 Xposed/LSPosed 模块 (com.wx.pad)。自 v1.0.2 起完全自包含，单一 APK 同时内置外观伪装 (`PadDisguise`) 与第一方平板登录资格 Hook (`PadLoginHook`，基于 DexKit 动态扫描)，无需任何第三方外部 APK。
 
-            ### 快速安装指南 (Non-Expert Quick Start)
+            ### 快速安装指南 (Quick Start)
             1. 下载下方 Assets 中的 `wx-tablet-mode-${{ github.ref_name }}-universal.apk`。
             2. 使用 `adb install` 或直接在手机上安装：
                ```bash
-               adb install wx-tablet-mode-${{ github.ref_name }}-universal.apk
+               adb install -r wx-tablet-mode-${{ github.ref_name }}-universal.apk
                ```
-            3. 在 LSPosed 管理器中启用该模块，勾选作用域为 **微信 (com.tencent.mm)**。
-            4. 强制停止并重新打开微信，在登录界面即可选择作为平板设备登录（扫码登录），实现双手机同账号登录。
+            3. 在 LSPosed / Vector 管理器中启用该模块，勾选作用域为 **微信 (com.tencent.mm)**。
+            4. 强制停止并重新打开微信，在登录界面即可选择作为平板设备登录（扫码登录），实现双手机同账号同时在线。
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
