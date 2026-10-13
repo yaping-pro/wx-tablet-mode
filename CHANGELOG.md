@@ -6,6 +6,7 @@
 ---
 ## [Unreleased]
 ### Added
+- **恢复微信交流群二维码**：恢复微信交流群二维码（`assets/wechat-group-qr.png`，群名称“微信个人助理交流”，有效期至 2026-10-20），并在 README / GitHub Issue 配置中补充有效期与 Discussions 双轨支持说明。
 - **开机后置验证协议 (`scripts/verify_post_boot.sh`)**：根据重启持久化分析（§7 Precaution 3），提供自动化设备验证工具，一次性校验 Vector 守护进程作用域包含 `com.wx.pad`（含用户 999/0）以及微信主进程 `/proc/<pid>/maps` 模块映射与 logcat 签名。
 
 ### Documented

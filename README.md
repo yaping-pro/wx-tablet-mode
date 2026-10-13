@@ -24,7 +24,7 @@
 - [🙏 致谢 (Credits)](#-致谢-credits)
 - [🔒 安全政策与免责声明](#-安全政策与免责声明)
 - [📄 开源许可证](#-开源许可证)
-- [💬 讨论与交流 (Discussions)](#-讨论与交流-discussions)
+- [💬 讨论与交流 (Discussions & Community)](#-讨论与交流-discussions--community)
 
 ---
 
@@ -247,10 +247,17 @@ TARGET_USER=999 bash scripts/verify_post_boot.sh
 
 ---
 
-## 💬 讨论与交流 (Discussions)
+## 💬 讨论与交流 (Discussions & Community)
 
-使用疑问、配置答疑与技术探讨请前往 [GitHub Discussions](https://github.com/yaping-pro/wx-tablet-mode/discussions)。
+<img src="assets/wechat-group-qr.png" alt="微信个人助理交流 群二维码" width="220" />
 
+**群名称**：`微信个人助理交流`
+
+> ⏳ **有效期提示**：本群二维码有效期为 **2026-10-20**，过期后请在 [GitHub Discussions](https://github.com/yaping-pro/wx-tablet-mode/discussions) 留言获取更新。仓库维护者会在群码轮换时更新 `assets/wechat-group-qr.png`，请始终以本仓库最新提交的图片为准。
+>
+> 💬 **在线交流**：使用疑问、配置答疑与技术探讨亦可直接前往 [GitHub Discussions](https://github.com/yaping-pro/wx-tablet-mode/discussions)。
+>
+> 🛠️ **维护者须知**：当群码轮换时，直接将 `assets/wechat-group-qr.png` 替换为最新的群二维码图片（同名覆盖），并更新上方有效期日期即可。
 ---
 
 ## English
@@ -266,7 +273,7 @@ TARGET_USER=999 bash scripts/verify_post_boot.sh
 - [🙏 Credits](#-credits)
 - [🔒 Security & Disclaimer](#-security--disclaimer)
 - [📄 License](#-license)
-- [💬 Discussions](#-discussions)
+- [💬 Discussions & Community](#-discussions--community)
 
 ---
 
@@ -488,6 +495,14 @@ For third-party components, dependencies, and license notices, see **[NOTICE](NO
 
 ---
 
-## 💬 Discussions
+## 💬 Discussions & Community
 
-For questions, troubleshooting, and discussions, please visit [GitHub Discussions](https://github.com/yaping-pro/wx-tablet-mode/discussions).
+<img src="assets/wechat-group-qr.png" alt="WeChat Personal Assistant Community group QR" width="220" />
+
+**Group name**: `微信个人助理交流` (WeChat Personal Assistant Community)
+
+> ⏳ **Expiry notice**: This WeChat group QR code is valid until **2026-10-20**. After expiration, please leave a message in [GitHub Discussions](https://github.com/yaping-pro/wx-tablet-mode/discussions) to get an updated code. The maintainer will update `assets/wechat-group-qr.png` when the QR code rotates; always refer to the latest committed image in this repository.
+>
+> 💬 **Online discussions**: For questions, troubleshooting, and general discussions, you can also directly visit [GitHub Discussions](https://github.com/yaping-pro/wx-tablet-mode/discussions).
+>
+> 🛠️ **Maintainer note**: When the group code rotates, simply replace `assets/wechat-group-qr.png` with the newest group QR image (same filename) and update the validity date above.
