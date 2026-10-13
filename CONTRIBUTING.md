@@ -8,7 +8,7 @@
 
 ## 核心原则与项目边界 (Core Principles & Boundaries)
 
-1. **纯开源与独立实现 (Clean-Room Implementation)**：
+1. **纯开源第一方实现与合规衍生 (First-Party Open Source Implementation)**：
    - 本项目核心代码（`app/`）基于纯开源逆向与动态 Hook（DexKit + LSPosed/Vector）。
    - **严禁提交任何来自微信官方或其他商业软件的专有二进制代码、反编译原码或未授权资源**。
    - 外部 Hook 兼容规范请参考 [`docs/EXTERNAL_HOOK_SPEC.md`](docs/EXTERNAL_HOOK_SPEC.md)。

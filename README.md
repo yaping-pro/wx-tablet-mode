@@ -24,14 +24,14 @@
 - [🙏 致谢 (Credits)](#-致谢-credits)
 - [🔒 安全政策与免责声明](#-安全政策与免责声明)
 - [📄 开源许可证](#-开源许可证)
-- [💬 交流群 (Community)](#-交流群-community)
+- [💬 讨论与交流 (Discussions)](#-讨论与交流-discussions)
 
 ---
 
 ### ⚠️ 核心前置声明与项目边界
 
 > **重要声明 (Crucial Prerequisite & Boundary)**：  
-> 1. **内置第一方 Pad 登录资格 Hook (v1.0.2+)**：自 `v1.0.2` 起，本项目实现**真正自包含**——在开源模块中内置了纯开源、干净实现的 `PadLoginHook`（基于 LuckyPray/DexKit 动态特征匹配）。它动态定位并拦截微信平板环境检测（`inTabletEnv`）与副设备扫码预检协程（`checkloginaspad`），**单 APK 即可完整赋予平板扫码同登资格，彻底无需任何未授权或闭源第三方 APK**。  
+> 1. **内置第一方 Pad 登录资格 Hook (v1.0.2+)**：自 `v1.0.2` 起，本项目实现**真正自包含**——在开源模块中内置了第一方 GPL-3.0 实现的 `PadLoginHook`，匹配器设计参考/衍生自 Houvven/I-Am-Pad (GPL-3.0) 并保留完整署名（基于 LuckyPray/DexKit 动态特征匹配）。它动态定位并拦截微信平板环境检测（`inTabletEnv`）与副设备扫码预检协程（`checkloginaspad`），**单 APK 即可完整赋予平板扫码同登资格，彻底无需任何未授权或闭源第三方 APK**。  
 > 2. **本项目包含什么**：开源模块 `com.wx.pad` 同时包含外观与断点伪装（`PadDisguise`，伪装 `sw600dp` 与强制竖屏锁定）与副设备登录资格赋予（`PadLoginHook`），并配套提供官方底包哈希校验、白纸认证态重置与守护自愈脚本。外部第三方 Hook 现已转为**完全可选的兼容项**（若偏好使用外部 Hook，可通过系统属性 `persist.wx.pad.loginhook 0` 随时切换，详见 [`docs/EXTERNAL_HOOK_SPEC.md`](docs/EXTERNAL_HOOK_SPEC.md)）。  
 > 3. **数据导出伴侣**：如需只读导出微信聊天记录接入 AI 助理，请搭配使用兄弟项目 [`wx-pad-exporter`](https://github.com/yaping-pro/wx-pad-exporter)。  
 > 4. **法律与合规诚实声明**：本项目属于个人设备上的系统适配与逆向工程研究，**绝不分发或修改任何微信专有二进制，亦不包含任何第三方专有代码**。模块在运行时 Hook 商业专有软件，仅供使用者在个人合法拥有的硬件与账号上用于学习与研究；使用者须自行对遵守《微信个人账号使用规范》与服务条款承担全部责任。  
@@ -58,13 +58,12 @@
 > **极速路径**：无需配置 Gradle 开发环境，直接下载预编译产物即可在 30 秒内装配就绪。
 
 #### 步骤 1：下载预编译 APK
-前往 [GitHub Releases 最新发布页](https://github.com/yaping-pro/wx-tablet-mode/releases/latest) 下载：
-- `wx-tablet-mode-v1.0.2-universal.apk`
+前往 [GitHub Releases 最新发布页](https://github.com/yaping-pro/wx-tablet-mode/releases/latest) 下载最新的 ARM 架构 APK（`wx-tablet-mode-*-arm.apk`，例如 `wx-tablet-mode-v1.0.4-arm.apk`）。
 
 #### 步骤 2：安装并激活 Xposed 模块
 ```bash
-# 1. 安装模块至设备
-adb install -r wx-tablet-mode-v1.0.2-universal.apk
+# 1. 安装模块至设备 (下载的最新 release APK，例如 wx-tablet-mode-v1.0.4-arm.apk)
+adb install -r wx-tablet-mode-*-arm.apk
 
 # 2. 在 LSPosed 或 Vector 管理器中：
 #    - 启用 "com.wx.pad" (WX Tablet Mode) 模块
@@ -214,15 +213,9 @@ TARGET_USER=999 bash scripts/preflight_check.sh
 
 ---
 
-## 💬 交流群 (Community)
+## 💬 讨论与交流 (Discussions)
 
-<img src="assets/wechat-group-qr.png" alt="微信个人助理交流 群二维码" width="220" />
-
-**群名称**：`微信个人助理交流`
-
-> ⏳ **有效期提示**：本群二维码为微信临时群码，**有效期有限，目前有效至 2026-10-20**。过期后将无法扫码加入。仓库维护者会在群码轮换时**替换 `assets/wechat-group-qr.png`**（单文件替换即可），请始终以本仓库最新提交的图片为准。若二维码已过期，请前往仓库 [Issues](https://github.com/yaping-pro/wx-tablet-mode/issues) 反馈，或查看 `assets/wechat-group-qr.png` 的最新提交版本。
-
-> 🛠️ **维护者须知**：当群码轮换时，直接将 `assets/wechat-group-qr.png` 替换为最新的群二维码图片（同名覆盖），并更新上方有效期日期即可，无需改动其他文件。
+使用疑问、配置答疑与技术探讨请前往 [GitHub Discussions](https://github.com/yaping-pro/wx-tablet-mode/discussions)。
 
 ---
 
@@ -239,14 +232,14 @@ TARGET_USER=999 bash scripts/preflight_check.sh
 - [🙏 Credits](#-credits)
 - [🔒 Security & Disclaimer](#-security--disclaimer)
 - [📄 License](#-license)
-- [💬 Community](#-community)
+- [💬 Discussions](#-discussions)
 
 ---
 
 ### ⚠️ Core Prerequisite & Project Boundary
 
 > **Crucial Notice (Prerequisite & Scope Boundary)**:  
-> 1. **First-Party Pad Login Hook Built-In (v1.0.2+)**: Starting with `v1.0.2`, this repository is **genuinely self-contained** — shipping our own clean-room, GPL-3.0 implementation of `PadLoginHook` (powered dynamically by LuckyPray/DexKit). It intercepts WeChat's tablet environment check (`inTabletEnv`) and secondary-device pre-qualification coroutine (`checkloginaspad`) at runtime, granting tablet QR scan-login eligibility in a **single APK with zero dependency on unlicensed third-party binaries**.  
+> 1. **First-Party Pad Login Hook Built-In (v1.0.2+)**: Starting with `v1.0.2`, this repository is **genuinely self-contained** — shipping our own first-party GPL-3.0 implementation of `PadLoginHook` (matcher design referenced/derived from Houvven/I-Am-Pad (GPL-3.0) with full attribution preserved, powered dynamically by LuckyPray/DexKit). It intercepts WeChat's tablet environment check (`inTabletEnv`) and secondary-device pre-qualification coroutine (`checkloginaspad`) at runtime, granting tablet QR scan-login eligibility in a **single APK with zero dependency on unlicensed third-party binaries**.  
 > 2. **What this repository provides**: The open-source `com.wx.pad` module provides BOTH appearance disguise (`PadDisguise`, `sw600dp` breakpoint and portrait locking) AND pad-login qualification (`PadLoginHook`), alongside official APK verification and self-healing governance scripts. Third-party external hooks are now **entirely optional** (and can be toggled via `persist.wx.pad.loginhook 0`; see [`docs/EXTERNAL_HOOK_SPEC.md`](docs/EXTERNAL_HOOK_SPEC.md)).  
 > 3. **Chat Stream Export**: For read-only chat export to AI assistants, see companion project [`wx-pad-exporter`](https://github.com/yaping-pro/wx-pad-exporter).  
 > 4. **Legal & Compliance Honesty**: This project is personal technical research into Android system adaptation and runtime hooking on personal hardware. **It distributes zero proprietary WeChat binaries and zero closed-source third-party binaries.** Hooking commercial proprietary applications carries account risk; users are solely responsible for compliance with WeChat Terms of Service.  
@@ -273,13 +266,12 @@ TARGET_USER=999 bash scripts/preflight_check.sh
 > **Shortest Path**: Skip Gradle compilation and set up everything within 30 seconds using prebuilt release assets.
 
 #### Step 1: Download Prebuilt APK
-Visit the [GitHub Releases Latest Page](https://github.com/yaping-pro/wx-tablet-mode/releases/latest) and download:
-- `wx-tablet-mode-v1.0.2-universal.apk`
+Visit the [GitHub Releases Latest Page](https://github.com/yaping-pro/wx-tablet-mode/releases/latest) and download the latest ARM APK (`wx-tablet-mode-*-arm.apk`, e.g. `wx-tablet-mode-v1.0.4-arm.apk`).
 
 #### Step 2: Install & Enable Xposed Module
 ```bash
-# 1. Install module APK onto target device
-adb install -r wx-tablet-mode-v1.0.2-universal.apk
+# 1. Install module APK onto target device (downloaded release APK, e.g. wx-tablet-mode-v1.0.4-arm.apk)
+adb install -r wx-tablet-mode-*-arm.apk
 
 # 2. Inside LSPosed or Vector Manager:
 #    - Enable "com.wx.pad" (WX Tablet Mode)
@@ -428,12 +420,6 @@ For third-party components, dependencies, and license notices, see **[NOTICE](NO
 
 ---
 
-## 💬 Community
+## 💬 Discussions
 
-<img src="assets/wechat-group-qr.png" alt="WeChat Personal Assistant Community group QR" width="220" />
-
-**Group name**: `微信个人助理交流` (WeChat Personal Assistant Community)
-
-> ⏳ **Expiry notice**: This is a WeChat temporary group QR code with **limited validity — currently valid until 2026-10-20**. It will stop working after expiry. The maintainer refreshes this file (`assets/wechat-group-qr.png`) by swapping in the newest group QR when it rotates, so always rely on the latest committed image in this repo. If the QR has expired, please open an [Issue](https://github.com/yaping-pro/wx-tablet-mode/issues) or check `assets/wechat-group-qr.png` for the latest committed version.
-
-> 🛠️ **Maintainer note**: When the group code rotates, simply replace `assets/wechat-group-qr.png` with the newest group QR image (same filename) and update the validity date above. No other files need to change.
+For questions, troubleshooting, and discussions, please visit [GitHub Discussions](https://github.com/yaping-pro/wx-tablet-mode/discussions).

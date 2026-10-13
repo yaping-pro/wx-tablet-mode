@@ -47,29 +47,58 @@ jobs:
       - name: Prepare Named Release Assets and Verify Signature
         run: |
           mkdir -p release-assets
-          TAG_NAME="${GITHUB_REF_NAME:-v1.0.3}"
+          TAG_NAME="${GITHUB_REF_NAME:-v1.0.4}"
           SRC_APK=$(ls app/build/outputs/apk/release/*.apk | head -n 1)
           if [ -z "$SRC_APK" ] || [ ! -f "$SRC_APK" ]; then
             echo "::error::Release APK not found in app/build/outputs/apk/release/"
             exit 1
           fi
-          # Target name: wx-tablet-mode-<tag>-universal.apk
-          TARGET_APK="release-assets/wx-tablet-mode-${TAG_NAME}-universal.apk"
+          # Target name: wx-tablet-mode-<tag>-arm.apk
+          TARGET_APK="release-assets/wx-tablet-mode-${TAG_NAME}-arm.apk"
           cp "$SRC_APK" "$TARGET_APK"
           echo "Prepared asset: $TARGET_APK ($(ls -lh "$TARGET_APK" | awk '{print $5}'))"
 
-          echo "Verifying APK Signature..."
-          if command -v apksigner >/dev/null 2>&1; then
-            apksigner verify --verbose "$TARGET_APK"
-          else
-            $ANDROID_HOME/build-tools/34.0.0/apksigner verify --verbose "$TARGET_APK" || \
-            find $ANDROID_HOME/build-tools/ -name apksigner -exec {} verify --verbose "$TARGET_APK" \;
+          # Discover build tools (apksigner & zipalign)
+          APKSIGNER=$(command -v apksigner 2>/dev/null || find "$ANDROID_HOME/build-tools" -name apksigner 2>/dev/null | sort -V | tail -n 1)
+          ZIPALIGN=$(command -v zipalign 2>/dev/null || find "$ANDROID_HOME/build-tools" -name zipalign 2>/dev/null | sort -V | tail -n 1)
+
+          if [ -z "$APKSIGNER" ] || [ ! -x "$APKSIGNER" ]; then
+            echo "::error::apksigner not found in PATH or $ANDROID_HOME/build-tools"
+            exit 1
           fi
+          if [ -z "$ZIPALIGN" ] || [ ! -x "$ZIPALIGN" ]; then
+            echo "::error::zipalign not found in PATH or $ANDROID_HOME/build-tools"
+            exit 1
+          fi
+
+          echo "1. Asserting 4-byte zipalign verification on $TARGET_APK..."
+          if ! "$ZIPALIGN" -c -v 4 "$TARGET_APK"; then
+            echo "::error::zipalign verification failed for $TARGET_APK"
+            exit 1
+          fi
+          echo "zipalign verification passed!"
+
+          echo "2. Asserting APK signature and certificate SHA-256 fingerprint..."
+          CERTS_OUT=$("$APKSIGNER" verify --print-certs --verbose "$TARGET_APK")
+          echo "$CERTS_OUT"
+
+          EXPECTED_FP="76:AD:A6:29:EA:2A:12:C6:77:67:22:52:15:63:2B:19:F8:31:78:F3:4F:92:C2:79:E6:44:6E:BC:25:84:30:C1"
+          CLEAN_EXPECTED=$(echo "$EXPECTED_FP" | tr -d ':' | tr '[:lower:]' '[:upper:]')
+          CLEAN_ACTUAL=$(echo "$CERTS_OUT" | grep -i "SHA-256" | tr -d ' :' | tr '[:lower:]' '[:upper:]')
+
+          if ! echo "$CLEAN_ACTUAL" | grep -q "$CLEAN_EXPECTED"; then
+            echo "::error::Signer certificate SHA-256 fingerprint mismatch!"
+            echo "Expected: $EXPECTED_FP ($CLEAN_EXPECTED)"
+            echo "Actual:   $CLEAN_ACTUAL"
+            exit 1
+          fi
+          echo "Signer certificate SHA-256 fingerprint verified: $EXPECTED_FP"
+
           # Hard gate: must contain META-INF signing cert (v1) or verified by apksigner (v2/v3)
           if ! unzip -l "$TARGET_APK" | grep -E "META-INF/.*\.(RSA|DSA|EC)"; then
             echo "Warning: No META-INF signature certificate found in ZIP (pure v2/v3 signing)"
           fi
-          echo "Signature verification passed successfully!"
+          echo "All release asset assertions passed successfully!"
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
@@ -91,10 +120,10 @@ jobs:
             微信平板模式 Xposed/LSPosed 模块 (com.wx.pad)。自 v1.0.2 起完全自包含，单一 APK 同时内置外观伪装 (`PadDisguise`) 与第一方平板登录资格 Hook (`PadLoginHook`，基于 DexKit 动态扫描)，无需任何第三方外部 APK。
 
             ### 快速安装指南 (Quick Start)
-            1. 下载下方 Assets 中的 `wx-tablet-mode-${{ github.ref_name }}-universal.apk`。
+            1. 下载下方 Assets 中的 `wx-tablet-mode-${{ github.ref_name }}-arm.apk`。
             2. 使用 `adb install` 或直接在手机上安装：
                ```bash
-               adb install -r wx-tablet-mode-${{ github.ref_name }}-universal.apk
+               adb install -r wx-tablet-mode-${{ github.ref_name }}-arm.apk
                ```
             3. 在 LSPosed / Vector 管理器中启用该模块，勾选作用域为 **微信 (com.tencent.mm)**。
             4. 强制停止并重新打开微信，在登录界面即可选择作为平板设备登录（扫码登录），实现双手机同账号同时在线。

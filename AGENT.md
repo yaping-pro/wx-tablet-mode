@@ -58,7 +58,7 @@ Then assert each item explicitly and **report what is MISSING with remediation**
 | Magisk/KernelSU | `adb shell su -c 'test -d /data/adb/modules && echo ok'` | `ok` | Install Magisk/KernelSU |
 | Zygisk + LSPosed/Vector | `adb shell su -c 'test -d /data/adb/modules/zygisk_vector -o -d /data/adb/modules/zygisk_lsposed && echo ok'` | `ok` | Install Zygisk + Vector (API-102) or LSPosed and enable Zygisk |
 | Official WeChat build | `adb shell su -c 'md5sum "$(pm path --user "$TARGET_USER" com.tencent.mm | sed s/package://)"'` | MD5 `846b411199ae49d335d31b3a17036440` | See Step 2 (verify/install official `8.0.78 / 0x28004e32`) |
-| Pad hook present | `adb shell pm list packages --user "$TARGET_USER" com.wx.pad` | prints package (or `com.roro.tablethook` if external) | **HARD GATE** → install `wx-tablet-mode-v1.0.2-universal.apk` (Step C) |
+| Pad hook present | `adb shell pm list packages --user "$TARGET_USER" com.wx.pad` | prints package (or `com.roro.tablethook` if external) | **HARD GATE** → install `wx-tablet-mode-*-arm.apk` (Step C) |
 
 ---
 
@@ -99,7 +99,7 @@ TARGET_USER="${TARGET_USER:-0}" bash scripts/reset_wechat_auth.sh
 
 ```bash
 # Prefer the prebuilt release asset; fall back to a locally built APK.
-adb install -r wx-tablet-mode-v1.0.2-universal.apk   # or: app/build/outputs/apk/release/app-release.apk
+adb install -r wx-tablet-mode-*-arm.apk   # or: app/build/outputs/apk/release/app-release.apk
 ```
 
 - **Expected output**: `Success`.
@@ -129,7 +129,7 @@ adb shell pm list packages --user "$TARGET_USER" com.roro.tablethook || true
 
 - **Expected output**: at least one hook package (`com.wx.pad` or `com.roro.tablethook`) is listed.
 - **Abort condition (HARD GATE)**: neither package is present → **STOP**, report:
-  "No pad hook installed. Install `wx-tablet-mode-v1.0.2-universal.apk` (Step C) and scope it to
+  "No pad hook installed. Install latest `wx-tablet-mode-*-arm.apk` from Releases (Step C) and scope it to
   `com.tencent.mm`, then re-run." Do NOT continue.
 ### Step F ⚠️ — Launch QR login
 
