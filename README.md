@@ -195,7 +195,7 @@ TARGET_USER=999 bash scripts/preflight_check.sh
 
 | 项目 | 说明 | 状态 / 链接 |
 | :--- | :--- | :--- |
-| **`wx-tablet-mode`** (当前项目) | 微信安卓平板模式辅助与环境治理套件（外观伪装 + 内置第一方平板登录资格 Hook，单 APK 自包含） | [yaping-pro/wx-tablet-mode](https://github.com/yaping-pro/wx-tablet-mode) |
+ | **`wx-tablet-mode`** (本仓库) | 微信安卓平板模式辅助与环境治理套件（外观伪装 + 内置第一方平板登录资格 Hook，单 APK 自包含） | [yaping-pro/wx-tablet-mode](https://github.com/yaping-pro/wx-tablet-mode) |
 | **`wx-pad-exporter`** | Pad 版微信实时聊天流只读导出守护进程 + 通用 Webhook / 个人 AI 助理数据管道（Xposed 探针 + Go 守护进程） | [yaping-pro/wx-pad-exporter](https://github.com/yaping-pro/wx-pad-exporter) |
 | **`wx-linux-exporter`** | Linux 原生 / 容器化微信导出管道（Linux 端微信消息只读导出与助理桥接） | [yaping-pro/wx-linux-exporter](https://github.com/yaping-pro/wx-linux-exporter) |
 
@@ -409,7 +409,7 @@ This repository is part of a toolkit suite for WeChat personal data sovereignty 
 
 | Project | Description | Link |
 | :--- | :--- | :--- |
-| **`wx-tablet-mode`** (Current) | Android tablet-mode coexistence toolkit with built-in first-party pad-login hook & appearance disguise (self-contained single APK). | [yaping-pro/wx-tablet-mode](https://github.com/yaping-pro/wx-tablet-mode) |
+ | **`wx-tablet-mode`** (this repo) | Android tablet-mode coexistence toolkit with built-in first-party pad-login hook & appearance disguise (self-contained single APK). | [yaping-pro/wx-tablet-mode](https://github.com/yaping-pro/wx-tablet-mode) |
 | **`wx-pad-exporter`** | Read-only realtime chat stream exporter daemon & universal assistant webhook bridge for tablet-mode WeChat (Xposed hook + Go daemon). | [yaping-pro/wx-pad-exporter](https://github.com/yaping-pro/wx-pad-exporter) |
 | **`wx-linux-exporter`** | Linux-native / containerized WeChat chatstream exporter pipeline & assistant bridge. | [yaping-pro/wx-linux-exporter](https://github.com/yaping-pro/wx-linux-exporter) |
 
