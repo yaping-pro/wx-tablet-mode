@@ -11,7 +11,7 @@
             android:value="true" />
         <meta-data
             android:name="xposeddescription"
-            android:value="WeChat Android Tablet Mode: Appearance Disguise, Portrait Lock &amp; Pad Login Hook"
+            android:value="WeChat Android Tablet Mode: Appearance Disguise, Portrait Lock &amp; Pad Login Hook" />
         <meta-data
             android:name="xposedminversion"
             android:value="82" />
