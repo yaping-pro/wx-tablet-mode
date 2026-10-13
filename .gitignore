@@ -1,0 +1,36 @@
+# Gradle / Android build intermediates
+.gradle/
+build/
+app/build/
+*.apk
+*.aab
+*.dex
+*.class
+
+# Android Studio / IntelliJ IDEA
+.idea/
+*.iml
+local.properties
+.DS_Store
+
+# Temporary files and logs
+*.log
+*.tmp
+*.bak
+*.swp
+*~
+
+# Environment & Secrets (Hard boundaries)
+.env
+.env.*
+*.pem
+*.key
+*.crt
+*.p12
+*.jks
+*.keystore
+
+# Secret patterns
+*auth_key*
+*token*
+*secret*

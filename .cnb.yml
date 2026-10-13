@@ -1,0 +1,66 @@
+# ---- wx-pad-sniffer / android-module ── CNB 云原生构建 ----
+# 触发：main push 自动触发 + api_trigger 远程触发。
+# 镜像：mingc/android-build-box:1.29.0（自带 SDK platform-34 + build-tools;34.0.0 + JDK8/11/17/21）
+# 阻塞规避：wrapper 已入库；xposed jar 已 vendor 进 app/libs/。
+# 产物：cnbcool/attachments 上传本次构建的 APK（非 Release）。
+# 密钥：签名相关用 CNB 仓库「变量/密钥」注入，勿写明文。
+# 实测路径（2026-10-03 探测）：JDK=/usr/lib/jvm/java-17-openjdk-amd64，ANDROID_HOME=/opt/android-sdk
+main:
+  push:
+    - name: build-android
+      docker:
+        image: mingc/android-build-box:1.29.0
+      env:
+        # 仅在需要签名时启用，值在 CNB 控制台「变量/密钥」配置：
+        # KEYSTORE_BASE64: ${KEYSTORE_BASE64}
+        # KEYSTORE_PASSWORD: ${KEYSTORE_PASSWORD}
+        # KEY_ALIAS: ${KEY_ALIAS}
+        # KEY_PASSWORD: ${KEY_PASSWORD}
+        JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
+        ANDROID_HOME: /opt/android-sdk
+      stages:
+        - name: show-env
+          script: |
+            java -version 2>&1 | head -1
+            sdkmanager --list_installed 2>/dev/null | grep -E "platforms;android-34|build-tools;34" || true
+        - name: build-release-apk
+          script: |
+            set -e
+            cd android-module
+            if [ -x ./gradlew ]; then
+              chmod +x ./gradlew
+              ./gradlew :app:assembleRelease --no-daemon
+            else
+              echo "[WARN] gradlew 不存在，回退镜像内 gradle"
+              gradle :app:assembleRelease --no-daemon
+            fi
+        - name: upload-apk
+          image: cnbcool/attachments:latest
+          settings:
+            attachments:
+              - android-module/app/build/outputs/apk/release/*.apk
+              - android-module/app/build/outputs/apk/release/output-metadata.json
+  api_trigger:
+    - name: remote-build
+      docker:
+        image: mingc/android-build-box:1.29.0
+      env:
+        JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
+        ANDROID_HOME: /opt/android-sdk
+      stages:
+        - name: build-release-apk
+          script: |
+            set -e
+            cd android-module
+            if [ -x ./gradlew ]; then
+              chmod +x ./gradlew
+              ./gradlew :app:assembleRelease --no-daemon
+            else
+              gradle :app:assembleRelease --no-daemon
+            fi
+        - name: upload-apk
+          image: cnbcool/attachments:latest
+          settings:
+            attachments:
+              - android-module/app/build/outputs/apk/release/*.apk
+              - android-module/app/build/outputs/apk/release/output-metadata.json
