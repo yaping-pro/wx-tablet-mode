@@ -21,6 +21,7 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage
  * PadDisguise specifically handles appearance, layout breakpoints (sw600dp), and screen
  * orientation locking. Tablet secondary-device login qualification is handled by sibling
  * component [PadLoginHook] (or alternatively an external protocol hook if desired).
+ */
 object PadDisguise {
     private const val TAG = "WX-PadDisguise"
 
