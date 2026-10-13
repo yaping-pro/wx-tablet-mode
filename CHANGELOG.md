@@ -4,6 +4,15 @@
 本项目遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/) 语义化版本规范，格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
 ---
+## [Unreleased]
+### Added
+- **开机后置验证协议 (`scripts/verify_post_boot.sh`)**：根据重启持久化分析（§7 Precaution 3），提供自动化设备验证工具，一次性校验 Vector 守护进程作用域包含 `com.wx.pad`（含用户 999/0）以及微信主进程 `/proc/<pid>/maps` 模块映射与 logcat 签名。
+
+### Documented
+- **Android 12 FBE 锁屏解锁约束与开机后置验证**：在 `README.md`（FAQ Q6 中英双语）与 `AGENT.md`（Step G）中明确：冷启动后受 Android 12 FBE 文件加密约束，分身空间（u999）需在用户首次解锁屏幕后方可访问与自启微信；记录了开机后置校验流程。
+
+---
+
 
 ## [v1.0.5] - 2026-10-14
 ### Fixed

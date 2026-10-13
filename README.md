@@ -163,7 +163,11 @@ TARGET_USER=999 bash scripts/preflight_check.sh
 **A**: `pm install-existing` 的前提是主用户（User 0）或系统底层中已经安装了该 APK。如果主空间从未安装过，必须先执行 `adb install <apk>`，然后再向特定分身空间映射。
 
 #### Q6: 重启手机后微信无法自启或报错找不到数据目录？
-**A**: Android 基于文件加密 (FBE)。开机后在用户首次输入锁屏密码前，凭据加密存储 (CE) 处于锁定状态。作为常驻副设备的备用机，建议在“开发者选项/安全设置”中取消锁屏密码，或开机后手动解锁一次。
+**A**: Android 12 基于文件加密 (FBE)。开机后在用户首次输入锁屏密码前，凭据加密存储 (CE) 处于锁定状态，分身空间（User 999）微信与数据目录不可访问，必须先解锁屏幕一次方可启动。若设备开机后需验证自启与 Hook 注入状态，可运行后置校验脚本：
+```bash
+TARGET_USER=999 bash scripts/verify_post_boot.sh
+```
+作为常驻副设备的备用机，亦可在“开发者选项/安全设置”中取消锁屏密码，实现冷启动免解锁全自动拉起。
 #### Q7: 在分身空间（如 User 999）安装模块后，微信仍没有生效 / 扫码页不出现？
 **A**: 这是 **Vector 守护进程克隆空间缓存未失效** 的已知问题，与模块本身无关：
 1. 即便已执行 `pm install-existing --user <UID> com.wx.pad`，Vector 守护进程内存态的 `DaemonState.validUserIds` 仍停留在 `{0}`，会**静默跳过 u999 注入**，直到缓存被强制重建。
@@ -399,8 +403,12 @@ TARGET_USER=999 bash scripts/preflight_check.sh
 #### Q5: `pm install-existing --user <UID>` fails with package not found?
 **A**: `pm install-existing` requires the APK to already exist under User 0. If it has never been installed on the device, run `adb install <apk>` first.
 
-#### Q6: WeChat fails to start after reboot?
-**A**: Android File-Based Encryption (FBE) locks Credential Encrypted (CE) storage until first unlock. For an always-on dedicated secondary device, consider removing the lockscreen password in system settings or unlocking manually once after boot.
+#### Q6: WeChat fails to start after phone reboot?
+**A**: Android 12 File-Based Encryption (FBE) keeps Credential Encrypted (CE) storage locked until the user unlocks the screen (PIN/pattern) for the first time. WeChat under clone space (User 999) cannot access its data or run until this first unlock. After unlocking, you can optionally run the post-boot verification protocol:
+```bash
+TARGET_USER=999 bash scripts/verify_post_boot.sh
+```
+For an always-on dedicated secondary device, you may also remove the lockscreen credential in Android settings to allow full automatic start upon cold reboot.
 #### Q7: Module installed in a clone space (e.g. User 999) but WeChat still not working / no QR code?
 **A**: This is the **known Vector daemon clone-space cache quirk**, unrelated to the module itself:
 1. Even after `pm install-existing --user <UID> com.wx.pad`, Vector daemon's in-memory `DaemonState.validUserIds` stays at `{0}` and **silently skips u999 injection** until the cache is force-rebuilt.

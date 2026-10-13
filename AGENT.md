@@ -194,6 +194,20 @@ adb shell su -c "ls -l /data/user/$TARGET_USER/com.tencent.mm/MicroMsg/autoauth.
 6. Login QR shown + `autoauth.cfg` grew to N bytes + logcat signature captured.
 7. Any step that was skipped or needs a human tap (e.g. enabling scope in the manager UI).
 
+
+### Step G — Post-Boot Verification Protocol (Durability Check)
+
+On device reboot, Android 12 File-Based Encryption (FBE) keeps user 999 CE storage locked until the user **unlocks the screen** (PIN/pattern). Once unlocked, verify durability & injection:
+
+```bash
+# Post-boot durability protocol (§7 Precaution 3):
+TARGET_USER=$TARGET_USER bash scripts/verify_post_boot.sh
+```
+
+Verifies:
+1. Vector daemon scope contains `com.wx.pad` for `com.tencent.mm` on user `$TARGET_USER`.
+2. Primary WeChat process maps `com.wx.pad` (`/proc/<pid>/maps`).
+3. Logcat records `微信平板登录模式已启用`.
 ---
 
 ## 4. Safety rails summary (must obey)
