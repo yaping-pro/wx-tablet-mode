@@ -20,9 +20,11 @@
 - [📦 仓库范围与功能定位](#-仓库范围与功能定位)
 - [❓ 常见问题与排错指南 (FAQ)](#-常见问题与排错指南-faq)
 - [📚 详细文档索引](#-详细文档索引)
+- [🤝 兄弟项目 (Sibling Projects)](#-兄弟项目-sibling-projects)
 - [🙏 致谢 (Credits)](#-致谢-credits)
 - [🔒 安全政策与免责声明](#-安全政策与免责声明)
 - [📄 开源许可证](#-开源许可证)
+- [💬 交流群 (Community)](#-交流群-community)
 
 ---
 
@@ -186,13 +188,23 @@ TARGET_USER=999 bash scripts/preflight_check.sh
 - **[LuckyPray/DexKit](https://github.com/LuckyPray/DexKit)** (LGPL-3.0) by LuckyPray：强大的 Android 运行时高性能 Dex 字节码动态匹配与解析引擎。
 - **[rovo89 / XposedBridge](https://github.com/rovo89/XposedBridge)** (Apache-2.0)：经典 Xposed 运行时接口标准。
 
----
+
+### 🤝 兄弟项目 (Sibling Projects)
+
+本项目是微信个人数据自主权与本地 AI 助理工具套件的一部分：
+
+| 项目 | 说明 | 状态 / 链接 |
+| :--- | :--- | :--- |
+| **`wx-tablet-mode`** (当前项目) | 微信安卓平板模式辅助与环境治理套件（外观伪装 + 内置第一方平板登录资格 Hook，单 APK 自包含） | [yaping-pro/wx-tablet-mode](https://github.com/yaping-pro/wx-tablet-mode) |
+| **`wx-pad-exporter`** | Pad 版微信实时聊天流只读导出守护进程 + 通用 Webhook / 个人 AI 助理数据管道（Xposed 探针 + Go 守护进程） | [yaping-pro/wx-pad-exporter](https://github.com/yaping-pro/wx-pad-exporter) |
+| **`wx-linux-exporter`** | Linux 原生 / 容器化微信导出管道（Linux 端微信消息只读导出与助理桥接） | [yaping-pro/wx-linux-exporter](https://github.com/yaping-pro/wx-linux-exporter) |
+
 
 ### 🔒 安全政策与免责声明
 
 - [安全政策与漏洞披露流程 (SECURITY.md)](SECURITY.md)
 - [开源免责声明 (DISCLAIMER.md)](DISCLAIMER.md)
-
+- [贡献指南 (CONTRIBUTING.md)](CONTRIBUTING.md)
 ---
 
 ### 📄 开源许可证
@@ -223,9 +235,11 @@ TARGET_USER=999 bash scripts/preflight_check.sh
 - [📦 Scope & Capability Positioning](#-scope--capability-positioning)
 - [❓ FAQ & Troubleshooting](#-faq--troubleshooting)
 - [📚 Documentation Index](#-documentation-index)
+- [🤝 Sibling Projects](#-sibling-projects)
 - [🙏 Credits](#-credits)
 - [🔒 Security & Disclaimer](#-security--disclaimer)
 - [📄 License](#-license)
+- [💬 Community](#-community)
 
 ---
 
@@ -388,13 +402,23 @@ We gratefully acknowledge the following open-source projects and their contribut
 - **[LuckyPray/DexKit](https://github.com/LuckyPray/DexKit)** (LGPL-3.0) by LuckyPray: High-performance runtime Dex parsing and bytecode query engine.
 - **[rovo89 / XposedBridge](https://github.com/rovo89/XposedBridge)** (Apache-2.0): Foundational Xposed framework API.
 
----
+
+### 🤝 Sibling Projects
+
+This repository is part of a toolkit suite for WeChat personal data sovereignty and local AI assistant pipelines:
+
+| Project | Description | Link |
+| :--- | :--- | :--- |
+| **`wx-tablet-mode`** (Current) | Android tablet-mode coexistence toolkit with built-in first-party pad-login hook & appearance disguise (self-contained single APK). | [yaping-pro/wx-tablet-mode](https://github.com/yaping-pro/wx-tablet-mode) |
+| **`wx-pad-exporter`** | Read-only realtime chat stream exporter daemon & universal assistant webhook bridge for tablet-mode WeChat (Xposed hook + Go daemon). | [yaping-pro/wx-pad-exporter](https://github.com/yaping-pro/wx-pad-exporter) |
+| **`wx-linux-exporter`** | Linux-native / containerized WeChat chatstream exporter pipeline & assistant bridge. | [yaping-pro/wx-linux-exporter](https://github.com/yaping-pro/wx-linux-exporter) |
+
 
 ### 🔒 Security & Disclaimer
 
 - [Security Policy (SECURITY.md)](SECURITY.md)
 - [Disclaimer (DISCLAIMER.md)](DISCLAIMER.md)
-
+- [Contributing Guidelines (CONTRIBUTING.md)](CONTRIBUTING.md)
 ---
 
 ### 📄 License
