@@ -1,0 +1,74 @@
+name: 🐛 Bug Report / 故障反馈
+description: 提交运行故障、Hook 失败、崩溃或意外行为 / Report an unexpected error, crash, or hook failure
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢反馈问题！请在提交前阅读本仓库的 [DISCLAIMER.md](https://github.com/yaping-pro/wx-tablet-mode/blob/main/DISCLAIMER.md) 和 [FAQ](https://github.com/yaping-pro/wx-tablet-mode#-%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%E4%B8%8E%E6%8E%92%E9%94%99%E6%8C%87%E5%8D%97-faq)。
+        **严禁**在日志或截图中包含个人隐私信息（如微信号、手机号、好友备注、聊天内容或 auth ticket）。
+  - type: textarea
+    id: description
+    attributes:
+      label: 问题描述 / What happened
+      description: 清晰扼要地描述遇到的问题或异常表现 / Clear and concise description of the bug
+      placeholder: 例如：更新到 v1.0.2 后，微信启动时未显示平板登录二维码，直接跳转至手机号登录页面...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期望行为 / Expected behavior
+      description: 正常情况下应该发生什么 / What should happen under normal conditions
+      placeholder: 例如：微信启动后展示双栏平板界面，并显示可供主手机扫码的登录二维码。
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤 / Steps to reproduce
+      description: 触发该问题的具体操作顺序 / Detailed steps to reproduce the behavior
+      value: |
+        1. 安装并激活 wx-tablet-mode 模块 (作用域勾选 com.tencent.mm)
+        2. 强行停止微信 (am force-stop com.tencent.mm)
+        3. 重新打开微信
+        4. 查看出现的问题：...
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: 运行环境 / Environment
+      description: 请详细提供您的设备与系统版本（对定位 Hook 问题至关重要） / Crucial for diagnosing hook failures
+      value: |
+        - 设备型号 (Device Model): e.g. Xiaomi 13 / Pixel 7 / Samsung S23
+        - Android 系统版本 (Android Version): e.g. Android 14 / HyperOS 1.0 / LineageOS 21
+        - Root 框架 (Root Framework): e.g. Magisk 27.0 / KernelSU 0.9.5 / APatch 10763
+        - Xposed 框架与版本 (Xposed Provider): e.g. LSPosed v1.9.2 (Zygisk) / Vector
+        - 模块版本 (Module Version): e.g. v1.0.2 (Commit xxx)
+        - 微信版本与构建号 (WeChat Version & Build Code): e.g. 8.0.78 (0x28004e32) 官方底包
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: 日志与截图 / Logs & Screenshots
+      description: |
+        请附上 LSPosed 模块日志、Logcat 过滤输出 (`logcat -d | grep -E "PadDisguise|PadLoginHook|DexKit"`) 或脱敏截图。
+        ⚠️ 提交前请务必确认已脱敏，移除真实 UIN、Ticket、手机号或敏感聊天内容！
+      placeholder: 粘贴脱敏后的代码块或拖拽上传截图...
+    validations:
+      required: false
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: 免责与合规确认 / Compliance & Disclaimer Confirmation
+      description: 提交前请仔细确认下列条款 / Please confirm before submitting
+      options:
+        - label: 我已阅读并完全理解本项目的 [DISCLAIMER.md](https://github.com/yaping-pro/wx-tablet-mode/blob/main/DISCLAIMER.md) 免责声明，知晓 Hook 商业软件的合规与风控风险。
+          required: true
+        - label: 本次测试与反馈发生在我个人拥有并完全受控的设备与微信账号上，严禁用于任何商业多开或恶意用途。
+          required: true
+        - label: 我已确认提交的内容、日志与截图中不包含任何敏感个人数据 (PII)、微信凭据或鉴权 Token。
+          required: true

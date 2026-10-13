@@ -1,0 +1,46 @@
+name: 💡 Feature Request / 功能建议
+description: 为 wx-tablet-mode 提出新功能、新机型伪装参数或改进建议 / Suggest an idea or improvement
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        欢迎提出功能改进建议！请注意本项目定位为**自包含的外观伪装与平板登录资格辅助模块**。
+        我们遵循严格的安全边界：不接受任何营销自动化、外挂、篡改通信数据或绕过安全限制的功能需求。
+  - type: textarea
+    id: problem
+    attributes:
+      label: 背景与痛点 / Problem statement
+      description: 当前遇到了什么不便，或者希望解决什么场景的需求？ / Is your feature request related to a problem?
+      placeholder: 例如：在某些特定折叠屏设备上，现有的平板伪装分辨率比例未适配...
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 期望方案 / Proposed solution
+      description: 您希望项目如何实现或支持这一功能？ / Describe the solution you'd like
+      placeholder: 详细描述建议的改动方向、逻辑或交互方式...
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 备选方案 / Alternatives considered
+      description: 您是否考虑过其他替代实现或变通方案？ / Describe any alternative solutions or features you've considered
+    validations:
+      required: false
+  - type: dropdown
+    id: scope
+    attributes:
+      label: 影响范围 / Scope
+      description: 该功能属于哪一部分 / Which component does this proposal touch?
+      options:
+        - "外观伪装 (PadDisguise / UI & Display Metrics)"
+        - "第一方登录 Hook (PadLoginHook / DexKit Matcher)"
+        - "安装部署与诊断脚本 (scripts / diagnostic tooling)"
+        - "文档与设备适配 (Documentation & Matrix)"
+        - "其他 (Other)"
+    validations:
+      required: true
