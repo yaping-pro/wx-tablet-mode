@@ -123,7 +123,7 @@ jobs:
           fi
           echo "All release asset assertions passed successfully!"
       - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: com.wx.pad-release
           path: release-assets/*.apk
