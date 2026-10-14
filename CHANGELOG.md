@@ -5,7 +5,7 @@
 
 ---
 
-## [Unreleased]
+## [v1.0.7] - 2026-10-14
 
 ### Added
 - **新增 Telegram 交流群作为二维码过期后的长期备用联系通道**：在 README 中文/英文「讨论与交流」区块与 GitHub Issue 模板中补充 [t.me/WeChatExporter](https://t.me/WeChatExporter) 入口；微信交流群二维码（`assets/wechat-group-qr.png`，有效期至 2026-10-20）与 GitHub Discussions 双轨方式保持不变。

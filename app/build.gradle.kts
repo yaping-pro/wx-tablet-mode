@@ -12,8 +12,8 @@ android {
         applicationId = "com.wx.pad"
         minSdk = 26
         targetSdk = 34
-        versionCode = 6
-        versionName = "1.0.6"
+        versionCode = 7
+        versionName = "1.0.7"
 
         ndk {
             abiFilters += listOf("arm64-v8a", "armeabi-v7a")
