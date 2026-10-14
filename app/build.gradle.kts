@@ -72,5 +72,5 @@ android {
 
 dependencies {
     compileOnly(files("libs/api-82.jar"))
-    implementation("org.luckypray:dexkit:2.1.0")
+    implementation("org.luckypray:dexkit:2.3.0")
 }
