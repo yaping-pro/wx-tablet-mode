@@ -10,6 +10,11 @@
 ### Added
 - **新增 Telegram 交流群作为二维码过期后的长期备用联系通道**：在 README 中文/英文「讨论与交流」区块与 GitHub Issue 模板中补充 [t.me/WeChatExporter](https://t.me/WeChatExporter) 入口；微信交流群二维码（`assets/wechat-group-qr.png`，有效期至 2026-10-20）与 GitHub Discussions 双轨方式保持不变。
 
+### Changed
+- **构建工具链现代化升级（AGP 9.4.1 + Gradle 9.8.1 + 内置 Kotlin）**：升级 Android Gradle Plugin 至 `9.4.1`，Gradle Wrapper 至 `9.8.1`；移除独立的 `org.jetbrains.kotlin.android` 插件，改用 AGP 9 内置 Kotlin 支持，配置由 `android.kotlinOptions` 迁移为顶层 `kotlin { compilerOptions { jvmTarget.set(JvmTarget.JVM_17) } }`；清理并收敛所有 Dependabot 依赖 PR。
+
+### Fixed
+- **免密 CI 构建签名与发布资产命名规范化**：CI 签名流程引入瞬时 debug 密钥（transient debug keystore），允许在未注入官方 release secrets 场景下（如 Fork / PR）平滑完成构建，并通过 `KEYSTORE_SOURCE=official|transient` 环境变量门禁证书指纹断言；对非 tag 引用的发布产物文件名执行字符过滤清洗，避免特殊分支引用破坏打包复制。
 ---
 ## [v1.0.6] - 2026-10-14
 ### Added

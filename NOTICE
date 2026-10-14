@@ -31,7 +31,7 @@ THIRD-PARTY COMPONENTS AND ATTRIBUTIONS
    - Author: LuckyPray
    - License: GNU Lesser General Public License v3.0 (LGPL-3.0)
    - Usage: Runtime bytecode scanning and method resolution library, dynamically
-     linked via Gradle dependency `org.luckypray:dexkit:2.1.0`.
+     linked via Gradle dependency `org.luckypray:dexkit:2.3.0`.
 
 3. Xposed Framework API
    - Upstream: https://github.com/rovo89/XposedBridge
