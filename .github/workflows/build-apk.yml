@@ -29,10 +29,23 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Decode Android Release Keystore
-        if: env.ANDROID_KEYSTORE_BASE64 != ''
+      - name: Setup Keystore (Official or Transient Debug Keystore for Fork PRs)
         run: |
-          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > /tmp/release.keystore
+          if [ -n "$ANDROID_KEYSTORE_BASE64" ]; then
+            echo "Decoding official release keystore..."
+            echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > /tmp/release.keystore
+            echo "KEYSTORE_SOURCE=official" >> $GITHUB_ENV
+          else
+            echo "No secret keystore found (fork PR or unconfigured secret). Generating transient keystore..."
+            keytool -genkeypair -v -keystore /tmp/release.keystore \
+              -alias androiddebugkey -keypass android -storepass android \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -dname "CN=Android Debug,O=Android,C=US"
+            echo "ANDROID_KEYSTORE_PASSWORD=android" >> $GITHUB_ENV
+            echo "ANDROID_KEY_ALIAS=androiddebugkey" >> $GITHUB_ENV
+            echo "ANDROID_KEY_PASSWORD=android" >> $GITHUB_ENV
+            echo "KEYSTORE_SOURCE=transient" >> $GITHUB_ENV
+          fi
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
 
@@ -40,21 +53,26 @@ jobs:
         run: ./gradlew assembleRelease --no-daemon
         env:
           ANDROID_KEYSTORE_FILE: /tmp/release.keystore
-          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ env.ANDROID_KEYSTORE_PASSWORD || secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ env.ANDROID_KEY_ALIAS || secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ env.ANDROID_KEY_PASSWORD || secrets.ANDROID_KEY_PASSWORD }}
 
       - name: Prepare Named Release Assets and Verify Signature
         run: |
           mkdir -p release-assets
-          TAG_NAME="${GITHUB_REF_NAME:-v1.0.4}"
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            ASSET_SUFFIX="${GITHUB_REF_NAME}"
+          else
+            SAFE_REF="${GITHUB_REF_NAME//\//-}"
+            ASSET_SUFFIX="${SAFE_REF:-sha-${GITHUB_SHA::7}}"
+          fi
           SRC_APK=$(ls app/build/outputs/apk/release/*.apk | head -n 1)
           if [ -z "$SRC_APK" ] || [ ! -f "$SRC_APK" ]; then
             echo "::error::Release APK not found in app/build/outputs/apk/release/"
             exit 1
           fi
-          # Target name: wx-tablet-mode-<tag>-arm.apk
-          TARGET_APK="release-assets/wx-tablet-mode-${TAG_NAME}-arm.apk"
+          # Target name: wx-tablet-mode-<suffix>-arm.apk
+          TARGET_APK="release-assets/wx-tablet-mode-${ASSET_SUFFIX}-arm.apk"
           cp "$SRC_APK" "$TARGET_APK"
           echo "Prepared asset: $TARGET_APK ($(ls -lh "$TARGET_APK" | awk '{print $5}'))"
 
@@ -82,17 +100,22 @@ jobs:
           CERTS_OUT=$("$APKSIGNER" verify --print-certs --verbose "$TARGET_APK")
           echo "$CERTS_OUT"
 
-          EXPECTED_FP="76:AD:A6:29:EA:2A:12:C6:77:67:22:52:15:63:2B:19:F8:31:78:F3:4F:92:C2:79:E6:44:6E:BC:25:84:30:C1"
-          CLEAN_EXPECTED=$(echo "$EXPECTED_FP" | tr -d ':' | tr '[:lower:]' '[:upper:]')
-          CLEAN_ACTUAL=$(echo "$CERTS_OUT" | grep -i "SHA-256" | tr -d ' :' | tr '[:lower:]' '[:upper:]')
+          if [ "$KEYSTORE_SOURCE" = "official" ]; then
+            echo "Asserting release cert fingerprint against official release cert..."
+            EXPECTED_FP="76:AD:A6:29:EA:2A:12:C6:77:67:22:52:15:63:2B:19:F8:31:78:F3:4F:92:C2:79:E6:44:6E:BC:25:84:30:C1"
+            CLEAN_EXPECTED=$(echo "$EXPECTED_FP" | tr -d ':' | tr '[:lower:]' '[:upper:]')
+            CLEAN_ACTUAL=$(echo "$CERTS_OUT" | grep -i "SHA-256" | tr -d ' :' | tr '[:lower:]' '[:upper:]')
 
-          if ! echo "$CLEAN_ACTUAL" | grep -q "$CLEAN_EXPECTED"; then
-            echo "::error::Signer certificate SHA-256 fingerprint mismatch!"
-            echo "Expected: $EXPECTED_FP ($CLEAN_EXPECTED)"
-            echo "Actual:   $CLEAN_ACTUAL"
-            exit 1
+            if ! echo "$CLEAN_ACTUAL" | grep -q "$CLEAN_EXPECTED"; then
+              echo "::error::Signer certificate SHA-256 fingerprint mismatch!"
+              echo "Expected: $EXPECTED_FP ($CLEAN_EXPECTED)"
+              echo "Actual:   $CLEAN_ACTUAL"
+              exit 1
+            fi
+            echo "Signer certificate SHA-256 fingerprint verified: $EXPECTED_FP"
+          else
+            echo "Transient keystore used for fork PR; skipping official fingerprint assertion."
           fi
-          echo "Signer certificate SHA-256 fingerprint verified: $EXPECTED_FP"
 
           # Hard gate: must contain META-INF signing cert (v1) or verified by apksigner (v2/v3)
           if ! unzip -l "$TARGET_APK" | grep -E "META-INF/.*\.(RSA|DSA|EC)"; then
