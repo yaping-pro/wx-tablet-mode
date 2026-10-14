@@ -256,7 +256,9 @@ TARGET_USER=999 bash scripts/verify_post_boot.sh
 > ⏳ **有效期提示**：本群二维码有效期为 **2026-10-20**，过期后请在 [GitHub Discussions](https://github.com/yaping-pro/wx-tablet-mode/discussions) 留言获取更新。仓库维护者会在群码轮换时更新 `assets/wechat-group-qr.png`，请始终以本仓库最新提交的图片为准。
 >
 > 💬 **在线交流**：使用疑问、配置答疑与技术探讨亦可直接前往 [GitHub Discussions](https://github.com/yaping-pro/wx-tablet-mode/discussions)。
->
+
+> ✈️ **Telegram 交流群**：[t.me/WeChatExporter](https://t.me/WeChatExporter)（长期有效，二维码过期时的备用联系通道）
+
 > 🛠️ **维护者须知**：当群码轮换时，直接将 `assets/wechat-group-qr.png` 替换为最新的群二维码图片（同名覆盖），并更新上方有效期日期即可。
 ---
 
@@ -504,5 +506,7 @@ For third-party components, dependencies, and license notices, see **[NOTICE](NO
 > ⏳ **Expiry notice**: This WeChat group QR code is valid until **2026-10-20**. After expiration, please leave a message in [GitHub Discussions](https://github.com/yaping-pro/wx-tablet-mode/discussions) to get an updated code. The maintainer will update `assets/wechat-group-qr.png` when the QR code rotates; always refer to the latest committed image in this repository.
 >
 > 💬 **Online discussions**: For questions, troubleshooting, and general discussions, you can also directly visit [GitHub Discussions](https://github.com/yaping-pro/wx-tablet-mode/discussions).
->
+
+> ✈️ **Telegram group**: [t.me/WeChatExporter](https://t.me/WeChatExporter) (durable fallback when the QR expires)
+
 > 🛠️ **Maintainer note**: When the group code rotates, simply replace `assets/wechat-group-qr.png` with the newest group QR image (same filename) and update the validity date above.

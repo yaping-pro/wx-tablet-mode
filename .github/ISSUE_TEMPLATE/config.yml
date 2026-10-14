@@ -9,3 +9,6 @@ contact_links:
   - name: 💬 微信个人助理交流群 / Community Group
     url: https://github.com/yaping-pro/wx-tablet-mode#-讨论与交流-discussions--community
     about: 加入微信个人助理交流群获取最新动态或交流讨论（群二维码定期维护更新）。/ Join community group.
+  - name: ✈️ Telegram 交流群 / Telegram Group
+    url: https://t.me/WeChatExporter
+    about: 二维码过期时的长期备用联系通道（长期有效）。/ Durable fallback contact channel when the QR expires (long-lived).

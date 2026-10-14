@@ -4,6 +4,13 @@
 本项目遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/) 语义化版本规范，格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
 ---
+
+## [Unreleased]
+
+### Added
+- **新增 Telegram 交流群作为二维码过期后的长期备用联系通道**：在 README 中文/英文「讨论与交流」区块与 GitHub Issue 模板中补充 [t.me/WeChatExporter](https://t.me/WeChatExporter) 入口；微信交流群二维码（`assets/wechat-group-qr.png`，有效期至 2026-10-20）与 GitHub Discussions 双轨方式保持不变。
+
+---
 ## [v1.0.6] - 2026-10-14
 ### Added
 - **恢复微信交流群二维码**：恢复微信交流群二维码（`assets/wechat-group-qr.png`，群名称“微信个人助理交流”，有效期至 2026-10-20），并在 README / GitHub Issue 配置中补充有效期与 Discussions 双轨支持说明。
