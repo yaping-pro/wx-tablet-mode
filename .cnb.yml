@@ -1,4 +1,4 @@
-# ---- wx-pad-sniffer / android-module ── CNB 云原生构建 ----
+# ---- wx-tablet-mode ⊂ Gradle 根（模块在 app/）── CNB 云原生构建 ----
 # 触发：main push 自动触发 + api_trigger 远程触发。
 # 镜像：mingc/android-build-box:1.29.0（自带 SDK platform-34 + build-tools;34.0.0 + JDK8/11/17/21）
 # 阻塞规避：wrapper 已入库；xposed jar 已 vendor 进 app/libs/。
@@ -26,7 +26,7 @@ main:
         - name: build-release-apk
           script: |
             set -e
-            cd android-module
+            # Gradle 根即仓库根（模块位于 app/），本项目没有 android-module 子目录
             if [ -x ./gradlew ]; then
               chmod +x ./gradlew
               ./gradlew :app:assembleRelease --no-daemon
@@ -38,8 +38,8 @@ main:
           image: cnbcool/attachments:latest
           settings:
             attachments:
-              - android-module/app/build/outputs/apk/release/*.apk
-              - android-module/app/build/outputs/apk/release/output-metadata.json
+              - app/build/outputs/apk/release/*.apk
+              - app/build/outputs/apk/release/output-metadata.json
   api_trigger:
     - name: remote-build
       docker:
@@ -51,7 +51,7 @@ main:
         - name: build-release-apk
           script: |
             set -e
-            cd android-module
+            # Gradle 根即仓库根（模块位于 app/），本项目没有 android-module 子目录
             if [ -x ./gradlew ]; then
               chmod +x ./gradlew
               ./gradlew :app:assembleRelease --no-daemon
@@ -62,5 +62,5 @@ main:
           image: cnbcool/attachments:latest
           settings:
             attachments:
-              - android-module/app/build/outputs/apk/release/*.apk
-              - android-module/app/build/outputs/apk/release/output-metadata.json
+              - app/build/outputs/apk/release/*.apk
+              - app/build/outputs/apk/release/output-metadata.json

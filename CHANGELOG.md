@@ -5,6 +5,19 @@
 
 ---
 
+## [Unreleased] - 2026-10-23
+
+### Fixed
+- **CNB 构建路径与实际仓库布局不符**：`.cnb.yml` 中 `cd android-module` 与产物附件路径 `android-module/app/build/outputs/...` 指向本仓库不存在的子目录（Gradle 根即仓库根，模块位于 `app/`）。该配置自 v1.0.0 起从未修正，`tensor-core/wx-tablet-mode` 在 CNB 上返回 404（仓库未镜像），故缺陷一直未暴露。现移除多余 `cd`，产物路径更正为 `app/build/outputs/apk/release/`，并修正文件头注释中误写的 `wx-pad-sniffer` 项目名。
+
+### Changed
+- **消除安装指引中硬编码的旧版本号**：README 中英双语安装章节的示例资产名由 `wx-tablet-mode-v1.0.4-arm.apk` 改为通配符 `wx-tablet-mode-*-arm.apk`，与「始终下载最新 Release」的表述一致，避免版本漂移（延续 v1.0.4 R-003 的单一真值源原则）。
+
+### Removed
+- **移除已过期的微信群二维码引用**：`assets/wechat-group-qr.png` 有效期至 2026-10-20，已过期 3 天。README 中英双语「讨论与交流」区块的 `<img>` 引用已撤下，避免访客误扫失效码；改为明确提示走 Telegram 群或 Discussions 取新码，并在维护者须知中保留轮换后恢复引用的操作步骤。图片文件本身保留于 `assets/`，供下次同名覆盖。
+
+---
+
 ## [v1.0.7] - 2026-10-14
 
 ### Added

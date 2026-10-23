@@ -58,11 +58,11 @@
 > **极速路径**：无需配置 Gradle 开发环境，直接下载预编译产物即可在 30 秒内装配就绪。
 
 #### 步骤 1：下载预编译 APK
-前往 [GitHub Releases 最新发布页](https://github.com/yaping-pro/wx-tablet-mode/releases/latest) 下载最新的 ARM 架构 APK（`wx-tablet-mode-*-arm.apk`，例如 `wx-tablet-mode-v1.0.4-arm.apk`）。
+前往 [GitHub Releases 最新发布页](https://github.com/yaping-pro/wx-tablet-mode/releases/latest) 下载最新的 ARM 架构 APK（`wx-tablet-mode-*-arm.apk`）。
 
 #### 步骤 2：安装并激活 Xposed 模块
 ```bash
-# 1. 安装模块至设备 (下载的最新 release APK，例如 wx-tablet-mode-v1.0.4-arm.apk)
+# 1. 安装模块至设备 (下载的最新 release APK)
 adb install -r wx-tablet-mode-*-arm.apk
 
 # 2. 在 LSPosed 或 Vector 管理器中：
@@ -249,17 +249,16 @@ TARGET_USER=999 bash scripts/verify_post_boot.sh
 
 ## 💬 讨论与交流 (Discussions & Community)
 
-<img src="assets/wechat-group-qr.png" alt="微信个人助理交流 群二维码" width="220" />
-
 **群名称**：`微信个人助理交流`
 
-> ⏳ **有效期提示**：本群二维码有效期为 **2026-10-20**，过期后请在 [GitHub Discussions](https://github.com/yaping-pro/wx-tablet-mode/discussions) 留言获取更新。仓库维护者会在群码轮换时更新 `assets/wechat-group-qr.png`，请始终以本仓库最新提交的图片为准。
+> ⚠️ **微信群二维码已过期（2026-10-20 失效）**：已暂时移除，避免误扫。请改用下方 Telegram 交流群，或在 [GitHub Discussions](https://github.com/yaping-pro/wx-tablet-mode/discussions) 留言获取新群码。
 >
 > 💬 **在线交流**：使用疑问、配置答疑与技术探讨亦可直接前往 [GitHub Discussions](https://github.com/yaping-pro/wx-tablet-mode/discussions)。
 
 > ✈️ **Telegram 交流群**：[t.me/WeChatExporter](https://t.me/WeChatExporter)（长期有效，二维码过期时的备用联系通道）
 
-> 🛠️ **维护者须知**：当群码轮换时，直接将 `assets/wechat-group-qr.png` 替换为最新的群二维码图片（同名覆盖），并更新上方有效期日期即可。
+> 🛠️ **维护者须知**：拿到新群码后，将图片提交为 `assets/wechat-group-qr.png`，并在上两节恢复 `<img>` 引用与新的有效期日期。
+
 ---
 
 ## English
@@ -309,11 +308,11 @@ TARGET_USER=999 bash scripts/verify_post_boot.sh
 > **Shortest Path**: Skip Gradle compilation and set up everything within 30 seconds using prebuilt release assets.
 
 #### Step 1: Download Prebuilt APK
-Visit the [GitHub Releases Latest Page](https://github.com/yaping-pro/wx-tablet-mode/releases/latest) and download the latest ARM APK (`wx-tablet-mode-*-arm.apk`, e.g. `wx-tablet-mode-v1.0.4-arm.apk`).
+Visit the [GitHub Releases Latest Page](https://github.com/yaping-pro/wx-tablet-mode/releases/latest) and download the latest ARM APK (`wx-tablet-mode-*-arm.apk`).
 
 #### Step 2: Install & Enable Xposed Module
 ```bash
-# 1. Install module APK onto target device (downloaded release APK, e.g. wx-tablet-mode-v1.0.4-arm.apk)
+# 1. Install module APK onto target device (downloaded release APK)
 adb install -r wx-tablet-mode-*-arm.apk
 
 # 2. Inside LSPosed or Vector Manager:
@@ -499,14 +498,12 @@ For third-party components, dependencies, and license notices, see **[NOTICE](NO
 
 ## 💬 Discussions & Community
 
-<img src="assets/wechat-group-qr.png" alt="WeChat Personal Assistant Community group QR" width="220" />
-
 **Group name**: `微信个人助理交流` (WeChat Personal Assistant Community)
 
-> ⏳ **Expiry notice**: This WeChat group QR code is valid until **2026-10-20**. After expiration, please leave a message in [GitHub Discussions](https://github.com/yaping-pro/wx-tablet-mode/discussions) to get an updated code. The maintainer will update `assets/wechat-group-qr.png` when the QR code rotates; always refer to the latest committed image in this repository.
+> ⚠️ **The WeChat group QR code expired on 2026-10-20** and has been removed to prevent mistaken scans. Use the Telegram group below, or leave a message in [GitHub Discussions](https://github.com/yaping-pro/wx-tablet-mode/discussions) to request a new code.
 >
 > 💬 **Online discussions**: For questions, troubleshooting, and general discussions, you can also directly visit [GitHub Discussions](https://github.com/yaping-pro/wx-tablet-mode/discussions).
 
 > ✈️ **Telegram group**: [t.me/WeChatExporter](https://t.me/WeChatExporter) (durable fallback when the QR expires)
 
-> 🛠️ **Maintainer note**: When the group code rotates, simply replace `assets/wechat-group-qr.png` with the newest group QR image (same filename) and update the validity date above.
+> 🛠️ **Maintainer note**: Once a new code is available, commit it as `assets/wechat-group-qr.png`, restore the `<img>` reference in both sections, and set a new validity date.
