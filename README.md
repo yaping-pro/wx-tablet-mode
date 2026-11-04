@@ -2,6 +2,8 @@
 
 > **微信安卓平板副设备登录的外观伪装、官方底包校验、第一方登录 Hook 与运行环境治理套件**  
 > Appearance disguise, official APK verification, first-party pad-login hook, and environment governance toolkit for running WeChat in secondary Android tablet mode.
+>
+> **典型场景**：把第二台安卓手机伪装成「平板」，与主力手机同时登录同一个微信 —— 两台手机互不踢下线。
 
 [![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
 [![Release](https://img.shields.io/github/v/release/yaping-pro/wx-tablet-mode?color=brightgreen)](https://github.com/yaping-pro/wx-tablet-mode/releases/latest)
@@ -14,6 +16,7 @@
 ## 中文
 
 ### 目录
+- [🎯 典型场景：两台手机同时登录同一个微信](#-典型场景两台手机同时登录同一个微信互不踢下线)
 - [⚠️ 核心前置声明与项目边界](#-核心前置声明与项目边界)
 - [⚡ 30 秒极速上手 (Quickstart)](#-30-秒极速上手-quickstart)
 - [🛠️ 从源码构建](#️-从源码构建)
@@ -25,6 +28,24 @@
 - [🔒 安全政策与免责声明](#-安全政策与免责声明)
 - [📄 开源许可证](#-开源许可证)
 - [💬 讨论与交流 (Discussions & Community)](#-讨论与交流-discussions--community)
+
+---
+
+### 🎯 典型场景：两台手机同时登录同一个微信，互不踢下线
+
+> **微信的官方规则**：同一账号只允许「手机 + 平板」同时在线；两台手机同时在线，后登录的一台会把前一台顶下线。
+>
+> **本项目的做法**：把其中一台（已 Root 的）安卓手机伪装成「平板」，并向微信申请平板副设备登录资格。在微信服务端看来，这就是「手机 + 平板」的合规组合 —— 于是**两台手机同时在线，互不踢下线**。
+
+| 角色 | 设备 | 微信视角 | 需要做什么 |
+| :--- | :--- | :--- | :--- |
+| 主设备 | 主力手机（任意机型） | 手机 | 官方微信正常登录，用于二维码确认授权 |
+| 副设备 | 备用安卓手机（**已 Root**） | **平板**（`smallestScreenWidthDp >= 600` + 强制竖屏） | 安装本模块 + 官方微信 `8.0.78`，不强改 APK |
+
+- 副设备打开微信即出现「平板登录」扫码页（不再是手机号/密码页），用主设备扫码确认，即成为副设备；此后两台手机同时在线，互不踢下线。
+- 主设备可随时踢掉副设备；副设备自行退出登录也不会影响主设备。
+- 副设备在微信侧按「平板」对待，功能集合以微信官方平板策略为准（部分能力可能受限）。本项目只解决登录资格与外观伪装，不修改、不绕过这些功能策略。
+- 备用机长期挂机：参考 FAQ Q6 取消锁屏密码即可冷启动自动拉起；副设备跑在分身空间 / 多用户环境（如 User 999）时，先看 FAQ Q4 与 Q7。
 
 ---
 
@@ -264,6 +285,7 @@ TARGET_USER=999 bash scripts/verify_post_boot.sh
 ## English
 
 ### Table of Contents
+- [🎯 Typical Scenario: Two Phones, One WeChat Account](#-typical-scenario-two-phones-one-wechat-account-neither-gets-kicked-out)
 - [⚠️ Core Prerequisite & Project Boundary](#️-core-prerequisite--project-boundary)
 - [⚡ 30-Second Quickstart](#-30-second-quickstart)
 - [🛠️ Build from Source](#️-build-from-source)
@@ -275,6 +297,24 @@ TARGET_USER=999 bash scripts/verify_post_boot.sh
 - [🔒 Security & Disclaimer](#-security--disclaimer)
 - [📄 License](#-license)
 - [💬 Discussions & Community](#-discussions--community)
+
+---
+
+### 🎯 Typical Scenario: Two Phones, One WeChat Account, Neither Gets Kicked Out
+
+> **WeChat's rule**: a single account may be online on *phone + tablet* at the same time; two *phones* online at once evict each other.
+>
+> **What this project does**: disguise one rooted Android phone as a *tablet* and obtain tablet secondary-device login eligibility. From WeChat's server the pair looks like the allowed "phone + tablet" — so **both phones stay online and never kick each other out**.
+
+| Role | Device | WeChat sees | What you need |
+| :--- | :--- | :--- | :--- |
+| Primary | Your main phone (any model) | phone | Official WeChat, used to scan and approve |
+| Secondary | Spare Android phone (**rooted**) | **tablet** (`smallestScreenWidthDp >= 600`, portrait locked) | This module + official WeChat `8.0.78`, no repacked APK |
+
+- Open WeChat on the secondary device and you get the *tablet login* QR page (not the phone-number login page). Scan it with the primary phone; both phones are then online with no mutual eviction.
+- The primary phone can revoke the secondary device at any time; the secondary device logging out never affects the primary one.
+- The secondary device is treated as a tablet by WeChat, so its feature set follows WeChat's official tablet policy (some capabilities may be limited). This project only handles login eligibility and appearance — it does not modify or bypass those feature rules.
+- For an always-on spare phone, see FAQ Q6 (removing the lock screen enables cold-boot auto-start); for dual-app / multi-user spaces (e.g. User 999), see FAQ Q4 and Q7.
 
 ---
 

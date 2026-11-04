@@ -7,6 +7,9 @@
 
 ## [Unreleased] - 2026-10-23
 
+### Added
+- **README 新增「典型场景」小节（中英双语）**：开篇明确本项目最核心的使用场景——把第二台已 Root 安卓手机伪装成平板，与主力手机同时登录同一个微信、互不踢下线；含主/副设备分工表、扫码授权流程、副设备功能边界说明，以及与 FAQ Q4/Q6/Q7 的挂机部署衔接。
+
 ### Fixed
 - **CNB 构建路径与实际仓库布局不符**：`.cnb.yml` 中 `cd android-module` 与产物附件路径 `android-module/app/build/outputs/...` 指向本仓库不存在的子目录（Gradle 根即仓库根，模块位于 `app/`）。该配置自 v1.0.0 起从未修正，`tensor-core/wx-tablet-mode` 在 CNB 上返回 404（仓库未镜像），故缺陷一直未暴露。现移除多余 `cd`，产物路径更正为 `app/build/outputs/apk/release/`，并修正文件头注释中误写的 `wx-pad-sniffer` 项目名。
 
